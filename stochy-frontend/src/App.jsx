@@ -26,6 +26,7 @@ import ProfilePage from './pages/user/ProfilePage';
 // Pages - Admin
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
+import AdminUserDetailPage from './pages/admin/AdminUserDetailPage';
 
 function PrivateRoute({ children, adminOnly = false }) {
   const { isAuthenticated, isAdmin } = useAuth();
@@ -69,6 +70,7 @@ export default function App() {
             <Route element={<PrivateRoute adminOnly={true}><AppLayout /></PrivateRoute>}>
               <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />
+              <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
             </Route>
 
             {/* Page non trouvée */}

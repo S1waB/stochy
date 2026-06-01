@@ -65,6 +65,7 @@ C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\entity\Notificati
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\service\SavingGoalService.java
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\dto\request\DebtRepaymentRequest.java
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\dto\request\CreateAdminRequest.java
+C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\dto\request\CreateUserRequest.java
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\entity\Debt.java
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\controller\AuthController.java
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\repository\CategoryRepository.java

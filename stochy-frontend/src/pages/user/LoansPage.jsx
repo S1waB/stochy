@@ -9,6 +9,8 @@ import ProgressBar from '../../components/common/ProgressBar';
 import Modal from '../../components/common/Modal';
 import Table from '../../components/common/Table';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import EmptyState from '../../components/common/EmptyState';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { formatCurrency, formatDate, formatPercent } from '../../utils/formatters';
 import { LOAN_TYPES } from '../../utils/constants';
 import toast from 'react-hot-toast';

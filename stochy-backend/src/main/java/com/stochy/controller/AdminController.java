@@ -1,8 +1,8 @@
 package com.stochy.controller;
 
 import com.stochy.dto.request.CreateAdminRequest;
-import com.stochy.dto.response.AdminDashboardResponse;
-import com.stochy.dto.response.UserResponse;
+import com.stochy.dto.request.CreateUserRequest;
+import com.stochy.dto.response.*;
 import com.stochy.enums.Gender;
 import com.stochy.enums.ProfessionalStatus;
 import com.stochy.enums.Role;
@@ -67,8 +67,42 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.CREATED).body(adminService.createAdmin(request));
     }
 
+    @PostMapping("/users")
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(adminService.createUser(request));
+    }
+
+    @PatchMapping("/users/{id}/role")
+    public ResponseEntity<UserResponse> changeUserRole(
+            @PathVariable UUID id,
+            @RequestParam String role) {
+        return ResponseEntity.ok(adminService.changeUserRole(id, role));
+    }
+
     @GetMapping("/dashboard")
     public ResponseEntity<AdminDashboardResponse> getDashboard() {
         return ResponseEntity.ok(adminService.getAdminDashboard());
+    }
+
+    @GetMapping("/users/{id}/transactions")
+    public ResponseEntity<Page<TransactionResponse>> getUserTransactions(
+            @PathVariable UUID id,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(adminService.getUserTransactions(id, pageable));
+    }
+
+    @GetMapping("/users/{id}/loans")
+    public ResponseEntity<java.util.List<LoanResponse>> getUserLoans(@PathVariable UUID id) {
+        return ResponseEntity.ok(adminService.getUserLoans(id));
+    }
+
+    @GetMapping("/users/{id}/debts")
+    public ResponseEntity<java.util.List<DebtResponse>> getUserDebts(@PathVariable UUID id) {
+        return ResponseEntity.ok(adminService.getUserDebts(id));
+    }
+
+    @GetMapping("/users/{id}/saving-goals")
+    public ResponseEntity<java.util.List<SavingGoalResponse>> getUserSavingGoals(@PathVariable UUID id) {
+        return ResponseEntity.ok(adminService.getUserSavingGoals(id));
     }
 }

@@ -11,6 +11,7 @@ import Modal from '../../components/common/Modal';
 import Pagination from '../../components/common/Pagination';
 import EmptyState from '../../components/common/EmptyState';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { TRANSACTION_TYPES, EXPENSE_TYPES, INCOME_TYPES, SCOPES } from '../../utils/constants';
 import toast from 'react-hot-toast';

@@ -1,8 +1,8 @@
 package com.stochy.service;
 
 import com.stochy.dto.request.CreateAdminRequest;
-import com.stochy.dto.response.AdminDashboardResponse;
-import com.stochy.dto.response.UserResponse;
+import com.stochy.dto.request.CreateUserRequest;
+import com.stochy.dto.response.*;
 import com.stochy.entity.User;
 import com.stochy.enums.*;
 import com.stochy.exception.BadRequestException;
@@ -33,10 +33,16 @@ public class AdminService {
     private final TransactionRepository transactionRepository;
     private final LoanRepository loanRepository;
     private final SavingGoalRepository savingGoalRepository;
+    private final TransactionService transactionService;
+    private final LoanService loanService;
+    private final DebtService debtService;
+    private final SavingGoalService savingGoalService;
 
     public AdminService(UserRepository userRepository, UserService userService, PasswordEncoder passwordEncoder,
                         EmailService emailService, TransactionRepository transactionRepository,
-                        LoanRepository loanRepository, SavingGoalRepository savingGoalRepository) {
+                        LoanRepository loanRepository, SavingGoalRepository savingGoalRepository,
+                        TransactionService transactionService, LoanService loanService,
+                        DebtService debtService, SavingGoalService savingGoalService) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -44,6 +50,10 @@ public class AdminService {
         this.transactionRepository = transactionRepository;
         this.loanRepository = loanRepository;
         this.savingGoalRepository = savingGoalRepository;
+        this.transactionService = transactionService;
+        this.loanService = loanService;
+        this.debtService = debtService;
+        this.savingGoalService = savingGoalService;
     }
 
     public Page<UserResponse> getUsers(String search, Role role, Boolean isActive,
@@ -75,6 +85,66 @@ public class AdminService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
         userRepository.delete(user);
+    }
+
+    @Transactional
+    public UserResponse createUser(CreateUserRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException("Email déjà utilisé: " + request.getEmail());
+        }
+        String tempPassword = generateSecurePassword();
+        Role userRole = Role.ROLE_USER;
+        if (request.getRole() != null && !request.getRole().isBlank()) {
+            try { userRole = Role.valueOf(request.getRole()); } catch (IllegalArgumentException ignored) {}
+        }
+        ProfessionalStatus ps = null;
+        if (request.getProfessionalStatus() != null && !request.getProfessionalStatus().isBlank()) {
+            try { ps = ProfessionalStatus.valueOf(request.getProfessionalStatus()); } catch (IllegalArgumentException ignored) {}
+        }
+        Gender g = null;
+        if (request.getGender() != null && !request.getGender().isBlank()) {
+            try { g = Gender.valueOf(request.getGender()); } catch (IllegalArgumentException ignored) {}
+        }
+        MaritalStatus ms = null;
+        if (request.getMaritalStatus() != null && !request.getMaritalStatus().isBlank()) {
+            try { ms = MaritalStatus.valueOf(request.getMaritalStatus()); } catch (IllegalArgumentException ignored) {}
+        }
+        User user = User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(tempPassword))
+                .phone(request.getPhone())
+                .professionalStatus(ps)
+                .gender(g)
+                .maritalStatus(ms)
+                .role(userRole)
+                .mustChangePassword(true)
+                .isActive(true)
+                .build();
+        user = userRepository.save(user);
+        String roleLabel = userRole == Role.ROLE_ADMIN ? "administrateur" : "utilisateur";
+        emailService.sendEmail(user.getEmail(), "STOCHY — Votre compte a été créé",
+                "Bonjour " + user.getFirstName() + ",\n\n"
+                        + "Un compte " + roleLabel + " a été créé pour vous sur STOCHY.\n\n"
+                        + "Email: " + user.getEmail() + "\n"
+                        + "Mot de passe temporaire: " + tempPassword + "\n\n"
+                        + "Veuillez changer votre mot de passe lors de votre première connexion.\n\n"
+                        + "Cordialement,\nL'équipe STOCHY");
+        return userService.mapToUserResponse(user);
+    }
+
+    @Transactional
+    public UserResponse changeUserRole(UUID userId, String newRole) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
+        Role role;
+        try { role = Role.valueOf(newRole); } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Rôle invalide: " + newRole);
+        }
+        user.setRole(role);
+        user = userRepository.save(user);
+        return userService.mapToUserResponse(user);
     }
 
     @Transactional
@@ -193,5 +263,21 @@ public class AdminService {
             sb.append(all.charAt(random.nextInt(all.length())));
         }
         return sb.toString();
+    }
+
+    public Page<TransactionResponse> getUserTransactions(UUID userId, Pageable pageable) {
+        return transactionService.getTransactions(userId, null, null, null, null, null, null, null, null, null, null, null, pageable);
+    }
+
+    public List<LoanResponse> getUserLoans(UUID userId) {
+        return loanService.getLoans(userId);
+    }
+
+    public List<DebtResponse> getUserDebts(UUID userId) {
+        return debtService.getDebts(userId, null);
+    }
+
+    public List<SavingGoalResponse> getUserSavingGoals(UUID userId) {
+        return savingGoalService.getGoals(userId, null, null);
     }
 }

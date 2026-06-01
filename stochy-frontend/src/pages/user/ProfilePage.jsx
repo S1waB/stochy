@@ -8,6 +8,7 @@ import Input from '../../components/common/Input';
 import Select from '../../components/common/Select';
 import { GENDERS, PROFESSIONAL_STATUSES, MARITAL_STATUSES, CURRENCIES } from '../../utils/constants';
 import toast from 'react-hot-toast';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { User, Lock, DollarSign, Camera } from 'lucide-react';
 
 export default function ProfilePage() {

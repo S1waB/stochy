@@ -1,27 +1,29 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import * as adminApi from '../../api/admin.api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
-import Select from '../../components/common/Select';
 import Table from '../../components/common/Table';
 import Modal from '../../components/common/Modal';
 import Pagination from '../../components/common/Pagination';
 import EmptyState from '../../components/common/EmptyState';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
-import { PROFESSIONAL_STATUSES, GENDERS } from '../../utils/constants';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { PROFESSIONAL_STATUSES, GENDERS, MARITAL_STATUSES } from '../../utils/constants';
 import toast from 'react-hot-toast';
-import { ShieldAlert, UserPlus, Search, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
+import { UserPlus, ToggleLeft, ToggleRight, Trash2, Eye } from 'lucide-react';
 
 export default function AdminUsersPage() {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   
   // Modals
-  const [isAddAdminOpen, setIsAddAdminOpen] = useState(false);
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
 
   // Filters
@@ -75,14 +77,21 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleCreateAdmin = async (data) => {
+  const handleCreateUser = async (data) => {
     try {
-      await adminApi.createAdmin(data);
-      toast.success('Nouvel administrateur créé !');
-      setIsAddAdminOpen(false);
+      const payload = {
+        ...data,
+        phone: data.phone || undefined,
+        professionalStatus: data.professionalStatus || undefined,
+        gender: data.gender || undefined,
+        maritalStatus: data.maritalStatus || undefined,
+      };
+      await adminApi.createUser(payload);
+      toast.success('Nouvel utilisateur créé ! Un email contenant ses accès temporaires lui a été envoyé.');
+      setIsAddUserOpen(false);
       fetchUsers();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Erreur lors de la création de l\'admin.');
+      toast.error(err.response?.data?.message || 'Erreur lors de la création de l\'utilisateur.');
     }
   };
 
@@ -94,20 +103,51 @@ export default function AdminUsersPage() {
       </div>
     )},
     { key: 'role', label: 'Rôle', render: (row) => (
-      <span className={`inline-flex px-2 py-0.5 rounded text-xs font-semibold ${row.role === 'ROLE_ADMIN' ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
-        {row.role === 'ROLE_ADMIN' ? 'Admin' : 'Utilisateur'}
-      </span>
+      <select
+        value={row.role}
+        onChange={async (e) => {
+          const newRole = e.target.value;
+          try {
+            await adminApi.changeUserRole(row.id, newRole);
+            toast.success(`Rôle de ${row.firstName} mis à jour !`);
+            fetchUsers();
+          } catch (err) {
+            toast.error(err.response?.data?.message || 'Erreur lors de la mise à jour du rôle');
+          }
+        }}
+        className="px-2 py-1 rounded text-xs font-semibold bg-gray-50 border border-gray-200 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+      >
+        <option value="ROLE_USER">Utilisateur</option>
+        <option value="ROLE_ADMIN">Admin</option>
+      </select>
     )},
+    { key: 'phone', label: 'Téléphone', render: (row) => row.phone || '-' },
+    { key: 'gender', label: 'Genre', render: (row) => GENDERS[row.gender] || '-' },
+    { key: 'maritalStatus', label: 'Statut Marital', render: (row) => MARITAL_STATUSES[row.maritalStatus] || '-' },
     { key: 'profStatus', label: 'Profession', render: (row) => PROFESSIONAL_STATUSES[row.professionalStatus] || '-' },
+    { key: 'createdAt', label: 'Date d\'inscription', render: (row) => row.createdAt ? new Date(row.createdAt).toLocaleDateString('fr-FR') : '-' },
     { key: 'isActive', label: 'Actif', render: (row) => (
       <button onClick={() => handleToggleActive(row)} className="text-gray-500 hover:text-primary transition-colors">
         {row.isActive ? <ToggleRight size={24} className="text-emerald-500" /> : <ToggleLeft size={24} className="text-gray-300" />}
       </button>
     )},
     { key: 'actions', label: 'Actions', render: (row) => (
-      <button onClick={() => setUserToDelete(row)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-gray-50 rounded-lg transition-colors">
-        <Trash2 size={16} />
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => navigate(`/admin/users/${row.id}`)}
+          className="p-1.5 text-gray-400 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors"
+          title="Voir le profil et les indicateurs"
+        >
+          <Eye size={16} />
+        </button>
+        <button
+          onClick={() => setUserToDelete(row)}
+          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-gray-50 rounded-lg transition-colors"
+          title="Supprimer définitivement"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
     )}
   ];
 
@@ -127,8 +167,8 @@ export default function AdminUsersPage() {
             <option value="false">Inactifs</option>
           </select>
         </div>
-        <Button onClick={() => { reset({ firstName: '', lastName: '', email: '', password: '' }); setIsAddAdminOpen(true); }}>
-          <UserPlus size={16} /> Créer un Admin
+        <Button onClick={() => { reset({ firstName: '', lastName: '', email: '', role: 'ROLE_USER', phone: '', gender: '', maritalStatus: '', professionalStatus: '' }); setIsAddUserOpen(true); }}>
+          <UserPlus size={16} /> Créer un Utilisateur
         </Button>
       </div>
 
@@ -137,28 +177,65 @@ export default function AdminUsersPage() {
         {loading ? (
           <div className="py-24"><LoadingSpinner /></div>
         ) : users.length > 0 ? (
-          <>
+          <div className="overflow-x-auto">
             <Table columns={columns} data={users} />
             <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
-          </>
+          </div>
         ) : (
           <EmptyState title="Aucun utilisateur trouvé" message="Modifiez les filtres de recherche." />
         )}
       </Card>
 
-      {/* Modal de création d'Admin */}
-      <Modal isOpen={isAddAdminOpen} onClose={() => setIsAddAdminOpen(false)} title="Créer un compte Administrateur" size="sm">
-        <form onSubmit={handleSubmit(handleCreateAdmin)} className="space-y-4">
+      {/* Modal de création d'Utilisateur */}
+      <Modal isOpen={isAddUserOpen} onClose={() => setIsAddUserOpen(false)} title="Créer un nouvel Utilisateur" size="md">
+        <form onSubmit={handleSubmit(handleCreateUser)} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <Input label="Prénom" {...register('firstName', { required: 'Prénom obligatoire' })} error={errors.firstName?.message} />
             <Input label="Nom" {...register('lastName', { required: 'Nom obligatoire' })} error={errors.lastName?.message} />
           </div>
-          <Input label="Email" type="email" {...register('email', { required: 'Email obligatoire' })} error={errors.email?.message} />
-          <Input label="Mot de passe temporaire" type="password" {...register('password', { required: 'Mot de passe obligatoire', minLength: 8 })} error={errors.password?.message} />
+          
+          <div className="grid grid-cols-2 gap-3">
+            <Input label="Email" type="email" {...register('email', { required: 'Email obligatoire' })} error={errors.email?.message} />
+            <Input label="Téléphone" {...register('phone')} />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Rôle *</label>
+              <select {...register('role', { required: 'Rôle obligatoire' })} className="input-field w-full">
+                <option value="ROLE_USER">Utilisateur</option>
+                <option value="ROLE_ADMIN">Admin</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Genre</label>
+              <select {...register('gender')} className="input-field w-full">
+                <option value="">Sélectionner</option>
+                {Object.entries(GENDERS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Statut marital</label>
+              <select {...register('maritalStatus')} className="input-field w-full">
+                <option value="">Sélectionner</option>
+                {Object.entries(MARITAL_STATUSES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Statut professionnel</label>
+              <select {...register('professionalStatus')} className="input-field w-full">
+                <option value="">Sélectionner</option>
+                {Object.entries(PROFESSIONAL_STATUSES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+          </div>
 
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsAddAdminOpen(false)}>Annuler</Button>
-            <Button type="submit">Créer l'Admin</Button>
+            <Button type="button" variant="outline" onClick={() => setIsAddUserOpen(false)}>Annuler</Button>
+            <Button type="submit">Créer l'Utilisateur</Button>
           </div>
         </form>
       </Modal>
