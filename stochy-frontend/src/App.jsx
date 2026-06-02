@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { Toaster } from 'react-hot-toast';
 
 // Layouts
@@ -39,8 +41,10 @@ function PrivateRoute({ children, adminOnly = false }) {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <NotificationProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <NotificationProvider>
         <Router>
           <Routes>
             {/* Redirection par défaut */}
@@ -78,7 +82,9 @@ export default function App() {
           </Routes>
         </Router>
         <Toaster position="top-right" toastOptions={{ duration: 4000, style: { background: '#333', color: '#fff' } }} />
-      </NotificationProvider>
-    </AuthProvider>
+          </NotificationProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
