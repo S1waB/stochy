@@ -154,7 +154,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       {/* Barre de contrôle supérieure */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel">
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           <Input placeholder="Rechercher par nom, email..." value={search} onChange={e => setSearch(e.target.value)} className="w-full sm:w-64" />
           <select value={profStatus} onChange={e => setProfStatus(e.target.value)} className="input-field w-auto">

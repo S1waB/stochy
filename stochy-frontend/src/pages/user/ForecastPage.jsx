@@ -31,10 +31,10 @@ export default function ForecastPage() {
   return (
     <div className="space-y-6">
       {/* Sélecteur de mois de prévision */}
-      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+      <div className="flex justify-between items-center glass-panel p-4 rounded-2xl">
         <div>
-          <h2 className="text-lg font-bold text-gray-800">Prévisions Financières Prédictives</h2>
-          <p className="text-xs text-gray-400">Simulation de trésorerie sur la base de vos revenus et dépenses récurrents.</p>
+          <h2 className="text-lg font-bold text-white">Prévisions Financières Prédictives</h2>
+          <p className="text-xs text-slate-300">Simulation de trésorerie sur la base de vos revenus et dépenses récurrents.</p>
         </div>
         <select value={months} onChange={e => setMonths(+e.target.value)} className="input-field w-auto">
           {[3, 6, 12, 24].map(m => <option key={m} value={m}>Prochains {m} mois</option>)}
@@ -43,7 +43,7 @@ export default function ForecastPage() {
 
       {/* Graphique de projection de trésorerie */}
       <Card>
-        <h3 className="text-sm font-semibold text-gray-700 mb-6">Évolution prévisionnelle de la trésorerie</h3>
+        <h3 className="text-sm font-semibold text-slate-200 mb-6">Évolution prévisionnelle de la trésorerie</h3>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>

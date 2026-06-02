@@ -127,7 +127,7 @@ export default function LoansPage() {
     <div className="space-y-6">
       {/* Barre supérieure */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-bold text-gray-800">Suivi des Emprunts & Dettes Financières</h2>
+        <h2 className="text-lg font-bold text-white">Suivi des Emprunts & Dettes Financières</h2>
         <Button onClick={handleOpenAdd}><Plus size={16} /> Nouveau prêt</Button>
       </div>
 
@@ -140,17 +140,17 @@ export default function LoansPage() {
             <Card key={l.id} className="space-y-4">
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-500">
+                    <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-500">
                     <Landmark size={24} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">{l.lenderName}</h3>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-600">
+                    <h3 className="text-lg font-bold text-white">{l.lenderName}</h3>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-white/5 text-slate-300">
                       {LOAN_TYPES[l.loanType]}
                     </span>
                   </div>
                 </div>
-                <button onClick={() => setLoanToDelete(l)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-gray-100 rounded-lg transition-colors">
+                <button onClick={() => setLoanToDelete(l)} className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-white/5 rounded-lg transition-colors">
                   <Trash2 size={16} />
                 </button>
               </div>
@@ -165,23 +165,23 @@ export default function LoansPage() {
               </div>
 
               {/* Détails financiers */}
-              <div className="grid grid-cols-2 gap-4 text-xs bg-gray-50 p-4 rounded-xl">
+                <div className="grid grid-cols-2 gap-4 text-xs bg-white/5 p-4 rounded-xl">
                 <div>
-                  <p className="text-gray-400">Mensualité</p>
-                  <p className="font-bold text-gray-800 text-sm mt-0.5">{formatCurrency(l.monthlyPayment)} / mois</p>
+                  <p className="text-slate-300">Mensualité</p>
+                  <p className="font-bold text-white text-sm mt-0.5">{formatCurrency(l.monthlyPayment)} / mois</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Taux d'intérêt</p>
-                  <p className="font-bold text-gray-800 text-sm mt-0.5">{l.interestRate}% ({l.isFixedRate ? 'Fixe' : 'Variable'})</p>
+                  <p className="text-slate-300">Taux d'intérêt</p>
+                  <p className="font-bold text-white text-sm mt-0.5">{l.interestRate}% ({l.isFixedRate ? 'Fixe' : 'Variable'})</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Total payé (Intérêts incl.)</p>
-                  <p className="font-bold text-gray-800 text-sm mt-0.5">{formatCurrency(l.totalPaid)}</p>
+                  <p className="text-slate-300">Total payé (Intérêts incl.)</p>
+                  <p className="font-bold text-white text-sm mt-0.5">{formatCurrency(l.totalPaid)}</p>
                 </div>
                 {l.nextDueDate && (
                   <div>
-                    <p className="text-gray-400">Prochaine échéance</p>
-                    <p className="font-bold text-amber-600 text-sm mt-0.5">{formatDate(l.nextDueDate)}</p>
+                    <p className="text-slate-300">Prochaine échéance</p>
+                    <p className="font-bold text-amber-400 text-sm mt-0.5">{formatDate(l.nextDueDate)}</p>
                   </div>
                 )}
               </div>

@@ -102,7 +102,7 @@ export default function ProfilePage() {
       <div className="space-y-6">
         <Card className="flex flex-col items-center text-center p-8 relative">
           <div className="relative group">
-            <div className="w-28 h-28 rounded-full border-4 border-[#2E5FA3]/10 overflow-hidden bg-gray-100 flex items-center justify-center text-gray-300">
+            <div className="w-28 h-28 rounded-full border-4 border-white/10 overflow-hidden bg-white/5 flex items-center justify-center text-slate-300">
               {profile?.profilePicUrl ? (
                 <img src={`http://localhost:8080${profile.profilePicUrl}`} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
@@ -114,9 +114,9 @@ export default function ProfilePage() {
               <Camera size={14} />
             </label>
           </div>
-          <h3 className="font-bold text-gray-900 text-lg mt-4">{profile?.firstName} {profile?.lastName}</h3>
-          <p className="text-sm text-gray-500">{profile?.email}</p>
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#2E5FA3]/10 text-[#2E5FA3] mt-3">
+          <h3 className="font-bold text-white text-lg mt-4">{profile?.firstName} {profile?.lastName}</h3>
+          <p className="text-sm text-slate-300">{profile?.email}</p>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-brand-light/10 text-brand-light mt-3">
             {profile?.role === 'ROLE_ADMIN' ? 'Administrateur' : 'Utilisateur Premium'}
           </span>
         </Card>
@@ -138,7 +138,7 @@ export default function ProfilePage() {
       {/* Formulaire complet de profil */}
       <div className="lg:col-span-2">
         <Card className="space-y-6">
-          <h3 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-white border-b border-white/10 pb-3 flex items-center gap-2">
             <User size={20} /> Informations personnelles & Préférences
           </h3>
           <form onSubmit={handleProfileSubmit(onUpdateProfile)} className="space-y-6">
@@ -158,15 +158,15 @@ export default function ProfilePage() {
               <Select label="Situation familiale" options={Object.entries(MARITAL_STATUSES).map(([k, v]) => ({ value: k, label: v }))} {...registerProfile('maritalStatus')} />
             </div>
 
-            <div className="border-t border-gray-100 pt-4">
-              <h4 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+            <div className="border-t border-white/10 pt-4">
+              <h4 className="text-sm font-bold text-slate-100 mb-3 flex items-center gap-2">
                 <DollarSign size={16} /> Devise par défaut
               </h4>
               <Select label="Choisir votre devise" options={CURRENCIES.map(c => ({ value: c, label: c }))} {...registerProfile('currency')} />
             </div>
 
-            <div className="border-t border-gray-100 pt-4 space-y-4">
-              <h4 className="text-sm font-bold text-gray-800">Adresse</h4>
+            <div className="border-t border-white/10 pt-4 space-y-4">
+              <h4 className="text-sm font-bold text-slate-100">Adresse</h4>
               <Input label="Pays" {...registerProfile('address.country')} />
               <div className="grid grid-cols-2 gap-4">
                 <Input label="Région / Gouvernorat" {...registerProfile('address.region')} />

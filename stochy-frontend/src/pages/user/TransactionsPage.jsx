@@ -133,8 +133,8 @@ export default function TransactionsPage() {
   const columns = [
     { key: 'title', label: 'Titre', render: (row) => (
       <div>
-        <p className="font-semibold text-gray-900">{row.title}</p>
-        {row.notes && <p className="text-xs text-gray-400 mt-0.5">{row.notes}</p>}
+        <p className="font-semibold text-white">{row.title}</p>
+        {row.notes && <p className="text-xs text-slate-300 mt-0.5">{row.notes}</p>}
       </div>
     )},
     { key: 'amount', label: 'Montant', render: (row) => {
@@ -152,11 +152,11 @@ export default function TransactionsPage() {
     )},
     { key: 'transactionDate', label: 'Date', render: (row) => formatDate(row.transactionDate) },
     { key: 'actions', label: 'Actions', render: (row) => (
-      <div className="flex gap-2 justify-end" onClick={e => e.stopPropagation()}>
-        <button onClick={() => handleOpenEdit(row)} className="p-1 text-gray-500 hover:text-primary-light rounded-lg hover:bg-gray-100 transition-colors">
+        <div className="flex gap-2 justify-end" onClick={e => e.stopPropagation()}>
+        <button onClick={() => handleOpenEdit(row)} className="p-1 text-slate-300 hover:text-primary-light rounded-lg hover:bg-white/5 transition-colors">
           <Edit size={16} />
         </button>
-        <button onClick={() => setTxToDelete(row)} className="p-1 text-gray-500 hover:text-red-500 rounded-lg hover:bg-gray-100 transition-colors">
+        <button onClick={() => setTxToDelete(row)} className="p-1 text-slate-300 hover:text-red-500 rounded-lg hover:bg-white/5 transition-colors">
           <Trash2 size={16} />
         </button>
       </div>
@@ -166,7 +166,7 @@ export default function TransactionsPage() {
   return (
     <div className="space-y-6">
       {/* Barre de contrôle supérieure */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel">
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
             <Input placeholder="Rechercher..." value={search} onChange={e => setSearch(e.target.value)} className="w-full sm:w-64" />
@@ -180,7 +180,7 @@ export default function TransactionsPage() {
             {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex gap-2 w-full sm:w-auto">
           <Button variant="outline" onClick={() => setIsImportOpen(true)} className="flex-1 sm:flex-none">
             <Upload size={16} /> CSV
           </Button>

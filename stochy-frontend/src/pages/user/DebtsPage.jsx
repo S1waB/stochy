@@ -90,7 +90,7 @@ export default function DebtsPage() {
     <div className="space-y-6">
       {/* Barre supérieure */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-bold text-gray-800">Dettes actives (Argent prêté)</h2>
+        <h2 className="text-lg font-bold text-white">Dettes actives (Argent prêté)</h2>
         <Button onClick={handleOpenAdd}><Plus size={16} /> Prêter de l'argent</Button>
       </div>
 
@@ -109,29 +109,29 @@ export default function DebtsPage() {
                       <User size={20} />
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900">{d.debtorName}</h3>
+                      <h3 className="font-bold text-white">{d.debtorName}</h3>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold ${isSettled ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
                         {DEBT_STATUSES[d.status]}
                       </span>
                     </div>
                   </div>
-                  <button onClick={() => setDebtToDelete(d)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-gray-100 rounded-lg transition-colors">
+                  <button onClick={() => setDebtToDelete(d)} className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-white/5 rounded-lg transition-colors">
                     <Trash2 size={16} />
                   </button>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-sm py-2">
                   <div>
-                    <span className="text-gray-400 block">Total prêté</span>
-                    <span className="font-bold text-gray-800">{formatCurrency(d.amountLent)}</span>
+                    <span className="text-slate-300 block">Total prêté</span>
+                    <span className="font-bold text-white">{formatCurrency(d.amountLent)}</span>
                   </div>
                   <div>
-                    <span className="text-gray-400 block">Reste à recouvrer</span>
-                    <span className={`font-bold ${isSettled ? 'text-gray-400' : 'text-amber-600'}`}>{formatCurrency(d.remainingAmount)}</span>
+                    <span className="text-slate-300 block">Reste à recouvrer</span>
+                    <span className={`font-bold ${isSettled ? 'text-slate-400' : 'text-amber-400'}`}>{formatCurrency(d.remainingAmount)}</span>
                   </div>
                 </div>
 
-                <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg flex flex-col gap-1.5">
+                <div className="text-xs text-slate-300 bg-white/5 p-3 rounded-lg flex flex-col gap-1.5">
                   <div className="flex items-center gap-1.5"><Calendar size={14} /> Date de prêt : {formatDate(d.loanDate)}</div>
                   {d.expectedRepaymentDate && (
                     <div className="flex items-center gap-1.5"><Calendar size={14} /> Date prévue : {formatDate(d.expectedRepaymentDate)}</div>
@@ -141,10 +141,10 @@ export default function DebtsPage() {
                 {/* Historique des remboursements */}
                 {d.repayments?.length > 0 && (
                   <div className="space-y-1.5">
-                    <h4 className="text-xs font-bold text-gray-600 uppercase tracking-widest">Remboursements reçus</h4>
+                    <h4 className="text-xs font-bold text-slate-300 uppercase tracking-widest">Remboursements reçus</h4>
                     <div className="space-y-1 max-h-24 overflow-y-auto pr-1">
                       {d.repayments.map(r => (
-                        <div key={r.id} className="flex justify-between text-xs text-gray-600 bg-emerald-50/50 p-2 rounded">
+                        <div key={r.id} className="flex justify-between text-xs text-slate-300 bg-emerald-50/50 p-2 rounded">
                           <span>{formatDate(r.repaymentDate)}</span>
                           <span className="font-semibold text-emerald-700">+{formatCurrency(r.amount)}</span>
                         </div>

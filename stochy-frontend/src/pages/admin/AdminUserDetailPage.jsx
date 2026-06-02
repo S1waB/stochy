@@ -101,25 +101,25 @@ export default function AdminUserDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header avec bouton retour */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-6 rounded-2xl">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate('/admin/users')}
-            className="p-2.5 text-gray-500 hover:text-primary hover:bg-gray-50 rounded-xl transition-all border border-gray-100"
+            className="p-2.5 text-slate-300 hover:text-primary hover:bg-white/5 rounded-xl transition-all border border-white/10"
           >
             <ArrowLeft size={20} />
           </button>
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-2xl font-bold text-gray-900">{user.firstName} {user.lastName}</h1>
+              <h1 className="text-2xl font-bold text-white">{user.firstName} {user.lastName}</h1>
               <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${user.role === 'ROLE_ADMIN' ? 'bg-red-50 text-red-600' : 'bg-primary/10 text-primary'}`}>
                 {user.role === 'ROLE_ADMIN' ? 'Admin' : 'Utilisateur'}
               </span>
-              <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${user.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-600'}`}>
+              <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${user.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-white/5 text-slate-300'}`}>
                 {user.isActive ? 'Actif' : 'Inactif'}
               </span>
             </div>
-            <p className="text-gray-400 text-sm mt-0.5">Membre depuis le {user.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}</p>
+            <p className="text-slate-300 text-sm mt-0.5">Membre depuis le {user.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}</p>
           </div>
         </div>
       </div>
@@ -129,34 +129,34 @@ export default function AdminUserDetailPage() {
         {/* Colonne de gauche : Informations personnelles */}
         <div className="space-y-6">
           <Card title="Détails du Profil" className="h-full">
-            <div className="flex flex-col items-center pb-6 border-b border-gray-100">
+            <div className="flex flex-col items-center pb-6 border-b border-white/10">
               <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center text-primary text-3xl font-bold uppercase mb-3 border-2 border-primary/20">
                 {user.firstName[0]}{user.lastName[0]}
               </div>
-              <h3 className="font-semibold text-lg text-gray-900">{user.firstName} {user.lastName}</h3>
-              <p className="text-gray-400 text-sm">{user.email}</p>
+                <h3 className="font-semibold text-lg text-white">{user.firstName} {user.lastName}</h3>
+                <p className="text-slate-300 text-sm">{user.email}</p>
             </div>
 
             <div className="space-y-4 pt-6">
-              <div className="flex items-center gap-3 text-sm text-gray-600">
+              <div className="flex items-center gap-3 text-sm text-slate-300">
                 <Briefcase size={16} className="text-gray-400" />
                 <span className="font-medium text-gray-500 w-28">Profession :</span>
-                <span className="text-gray-900 font-semibold">{PROFESSIONAL_STATUSES[user.professionalStatus] || 'Non spécifié'}</span>
+                <span className="text-white font-semibold">{PROFESSIONAL_STATUSES[user.professionalStatus] || 'Non spécifié'}</span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-gray-600">
+              <div className="flex items-center gap-3 text-sm text-slate-300">
                 <User size={16} className="text-gray-400" />
-                <span className="font-medium text-gray-500 w-28">Genre :</span>
-                <span className="text-gray-900 font-semibold">{GENDERS[user.gender] || 'Non spécifié'}</span>
+                <span className="font-medium text-slate-300 w-28">Genre :</span>
+                <span className="text-white font-semibold">{GENDERS[user.gender] || 'Non spécifié'}</span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-gray-600">
+              <div className="flex items-center gap-3 text-sm text-slate-300">
                 <Heart size={16} className="text-gray-400" />
-                <span className="font-medium text-gray-500 w-28">Statut marital :</span>
-                <span className="text-gray-900 font-semibold">{MARITAL_STATUSES[user.maritalStatus] || 'Non spécifié'}</span>
+                <span className="font-medium text-slate-300 w-28">Statut marital :</span>
+                <span className="text-white font-semibold">{MARITAL_STATUSES[user.maritalStatus] || 'Non spécifié'}</span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-gray-600">
+              <div className="flex items-center gap-3 text-sm text-slate-300">
                 <Phone size={16} className="text-gray-400" />
-                <span className="font-medium text-gray-500 w-28">Téléphone :</span>
-                <span className="text-gray-900 font-semibold">{user.phone || 'Non spécifié'}</span>
+                <span className="font-medium text-slate-300 w-28">Téléphone :</span>
+                <span className="text-white font-semibold">{user.phone || 'Non spécifié'}</span>
               </div>
               
               {user.address && (user.address.country || user.address.region || user.address.municipality) && (

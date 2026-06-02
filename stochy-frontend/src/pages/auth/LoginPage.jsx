@@ -28,29 +28,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0F2847] via-[#1A3C6E] to-[#2E5FA3] p-6">
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
-        <div className="px-8 py-8 text-center bg-gradient-to-r from-[#214a7a] to-[#2e5fa3]">
-          <div className="flex items-center justify-center">
-            <img src="/logo.png" alt="STOCHY" className="w-14 h-14 rounded-md object-cover mr-3" onError={(e)=>{e.currentTarget.style.display='none'}} />
+    <div className="glass-panel relative p-6 lg:p-8">
+      <div className="absolute -right-10 top-8 h-24 w-24 rounded-full bg-[#2e5fa3]/20 blur-2xl" />
+      <div className="absolute left-8 top-6 h-20 w-20 rounded-full bg-[#facc15]/20 blur-2xl" />
+      <div className="relative space-y-6">
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="STOCHY" className="h-12 w-12 rounded-2xl object-cover border border-white/10 bg-slate-900" onError={(e)=>{e.currentTarget.style.display='none'}} />
             <div>
-              <h1 className="text-2xl font-bold text-white">STOCHY</h1>
-              <p className="text-sm text-blue-100">Gestion intelligente de votre portefeuille</p>
+              <h1 className="text-3xl font-bold text-white">STOCHY</h1>
+              <p className="text-sm text-slate-300">Gestion intelligente de votre portefeuille</p>
             </div>
           </div>
-        </div>
-        <div className="p-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">Connexion</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-300 mb-6">Accédez à votre espace STOCHY</p>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <Input label="Email" type="email" placeholder="votre@email.com" {...register('email', { required: 'Email obligatoire' })} error={errors.email?.message} />
-            <Input label="Mot de passe" type="password" placeholder="••••••••" {...register('password', { required: 'Mot de passe obligatoire' })} error={errors.password?.message} />
-            <Button type="submit" disabled={loading} className="w-full">{loading ? 'Connexion...' : <><LogIn size={18} />Se connecter</>}</Button>
-          </form>
-          <div className="mt-6 text-center text-sm space-y-2">
-            <Link to="/forgot-password" className="text-[#2E5FA3] hover:underline block">Mot de passe oublié ?</Link>
-            <p className="text-gray-500 dark:text-gray-300">Pas de compte ? <Link to="/register" className="text-[#2E5FA3] font-medium hover:underline">Créer un compte</Link></p>
+          <div>
+            <h2 className="text-3xl font-semibold text-white">Connexion</h2>
+            <p className="text-sm text-slate-400">Accédez à votre espace STOCHY</p>
           </div>
+        </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <Input label="Email" type="email" placeholder="votre@email.com" {...register('email', { required: 'Email obligatoire' })} error={errors.email?.message} />
+          <Input label="Mot de passe" type="password" placeholder="••••••••" {...register('password', { required: 'Mot de passe obligatoire' })} error={errors.password?.message} />
+          <Button type="submit" disabled={loading} className="w-full">{loading ? 'Connexion...' : <><LogIn size={18} />Se connecter</>}</Button>
+        </form>
+        <div className="flex flex-col gap-3 text-center text-sm text-slate-400">
+          <Link to="/forgot-password" className="text-sky-300 hover:text-sky-200">Mot de passe oublié ?</Link>
+          <p>Pas de compte ? <Link to="/register" className="text-sky-300 font-medium hover:text-sky-200">Créer un compte</Link></p>
         </div>
       </div>
     </div>

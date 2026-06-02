@@ -111,7 +111,7 @@ export default function GoalsPage() {
     <div className="space-y-6">
       {/* Barre supérieure */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-bold text-gray-800">Suivi des Objectifs d'Épargne</h2>
+        <h2 className="text-lg font-bold text-white">Suivi des Objectifs d'Épargne</h2>
         <Button onClick={handleOpenAdd}><Plus size={16} /> Nouvel objectif</Button>
       </div>
 
@@ -124,8 +124,8 @@ export default function GoalsPage() {
             <Card key={g.id} className="space-y-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">{g.name}</h3>
-                  {g.description && <p className="text-sm text-gray-500 mt-1">{g.description}</p>}
+                  <h3 className="text-xl font-bold text-white">{g.name}</h3>
+                  {g.description && <p className="text-sm text-slate-300 mt-1">{g.description}</p>}
                 </div>
                 <div className="flex gap-1" onClick={e => e.stopPropagation()}>
                   <button onClick={() => handleOpenEdit(g)} className="p-1.5 text-gray-500 hover:text-primary rounded-lg hover:bg-gray-100 transition-colors">
@@ -147,7 +147,7 @@ export default function GoalsPage() {
               </div>
 
               {/* Détails supplémentaires */}
-              <div className="grid grid-cols-2 gap-3 text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
+              <div className="grid grid-cols-2 gap-3 text-xs text-slate-300 bg-white/5 p-3 rounded-lg">
                 <div className="flex items-center gap-1.5">
                   <Calendar size={14} />
                   <span>Date cible : {g.targetDate ? formatDate(g.targetDate) : 'Aucune'}</span>

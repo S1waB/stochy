@@ -102,7 +102,7 @@ export default function BudgetsPage() {
   return (
     <div className="space-y-6">
       {/* Barre de contrôle supérieure */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel">
         <div className="flex items-center gap-3">
           <select value={month} onChange={e => setMonth(+e.target.value)} className="input-field w-auto">
             {Array.from({ length: 12 }, (_, i) => (
@@ -136,16 +136,16 @@ export default function BudgetsPage() {
               <Card key={b.budget?.id || b.categoryName} className="space-y-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-bold text-gray-900 text-lg">{b.categoryName}</h3>
-                    <p className="text-sm text-gray-400">
-                      Limite : <span className="font-semibold text-gray-700">{formatCurrency(b.budgetedAmount)}</span>
+                    <h3 className="font-bold text-white text-lg">{b.categoryName}</h3>
+                    <p className="text-sm text-slate-300">
+                      Limite : <span className="font-semibold text-white">{formatCurrency(b.budgetedAmount)}</span>
                     </p>
                   </div>
-                  <div className="flex gap-1.5" onClick={e => e.stopPropagation()}>
-                    <button onClick={() => handleOpenAdd(b)} className="p-1.5 text-gray-500 hover:text-[#2E5FA3] hover:bg-gray-100 rounded-lg transition-colors">
+                    <div className="flex gap-1.5" onClick={e => e.stopPropagation()}>
+                    <button onClick={() => handleOpenAdd(b)} className="p-1.5 text-slate-300 hover:text-[#2E5FA3] hover:bg-white/5 rounded-lg transition-colors">
                       <Edit size={16} />
                     </button>
-                    <button onClick={() => setBudgetToDelete(b.budget)} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-gray-100 rounded-lg transition-colors">
+                    <button onClick={() => setBudgetToDelete(b.budget)} className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-white/5 rounded-lg transition-colors">
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -153,13 +153,13 @@ export default function BudgetsPage() {
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Dépensé :</span>
+                    <span className="text-slate-300">Dépensé :</span>
                     <span className={`font-semibold ${isExceeded ? 'text-red-500' : 'text-emerald-600'}`}>
                       {formatCurrency(b.spentAmount)} ({formatPercent(b.usagePercent)})
                     </span>
                   </div>
                   <ProgressBar value={b.usagePercent} />
-                  <div className="flex justify-between text-xs text-gray-400">
+                  <div className="flex justify-between text-xs text-slate-300">
                     <span>Restant : {formatCurrency(b.remainingAmount)}</span>
                     <span>Alerte à {b.budget?.alertThresholdPct || 80}%</span>
                   </div>

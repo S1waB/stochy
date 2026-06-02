@@ -112,13 +112,13 @@ export default function SavingsPage() {
     <div className="space-y-6">
       {/* Résumé des soldes */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="flex items-center gap-4 border-l-4 border-l-[#2E5FA3]">
+        <Card className="flex items-center gap-4 border-l-4 border-l-brand-light/40">
           <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-[#2E5FA3]">
             <PiggyBank size={24} />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Épargne totale</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(balance.totalSaved)}</p>
+            <p className="text-sm text-slate-300">Épargne totale</p>
+            <p className="text-2xl font-bold text-white">{formatCurrency(balance.totalSaved)}</p>
           </div>
         </Card>
         
@@ -127,8 +127,8 @@ export default function SavingsPage() {
             <Target size={24} />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Alloué aux objectifs</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(balance.allocatedToGoals)}</p>
+            <p className="text-sm text-slate-300">Alloué aux objectifs</p>
+            <p className="text-2xl font-bold text-white">{formatCurrency(balance.allocatedToGoals)}</p>
           </div>
         </Card>
 
@@ -137,15 +137,15 @@ export default function SavingsPage() {
             <Wallet size={24} />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Solde libre d'utilisation</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(balance.freeBalance)}</p>
+            <p className="text-sm text-slate-300">Solde libre d'utilisation</p>
+            <p className="text-2xl font-bold text-white">{formatCurrency(balance.freeBalance)}</p>
           </div>
         </Card>
       </div>
 
       {/* Titre & Bouton d'ajout */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-bold text-gray-800">Règles d'épargne automatique</h2>
+        <h2 className="text-lg font-bold text-white">Règles d'épargne automatique</h2>
         <Button onClick={handleOpenAdd}><Plus size={16} /> Ajouter une règle</Button>
       </div>
 
@@ -161,23 +161,23 @@ export default function SavingsPage() {
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#2E5FA3]/10 text-[#2E5FA3] mb-2">
                     {SAVING_MODES[c.mode]}
                   </span>
-                  <p className="text-xl font-extrabold text-gray-900">
+                  <p className="text-xl font-extrabold text-white">
                     {c.mode === 'PERCENTAGE' ? `${c.percentage}% des revenus` : `${formatCurrency(c.fixedAmount)}`}
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-slate-300 mt-1">
                     {c.mode === 'PERCENTAGE' 
                       ? (c.applyToAllIncomes ? 'Appliqué à tous les revenus' : `Sur : ${c.specificIncomeTypes.join(', ')}`)
                       : `Fréquence : ${FREQUENCIES[c.frequency]}`}
                   </p>
                 </div>
-                <div className="flex gap-1">
-                  <button onClick={() => handleToggle(c)} className={`p-1.5 rounded-lg transition-colors ${c.isActive ? 'text-emerald-500 hover:bg-emerald-50' : 'text-gray-400 hover:bg-gray-100'}`}>
+                  <div className="flex gap-1">
+                  <button onClick={() => handleToggle(c)} className={`p-1.5 rounded-lg transition-colors ${c.isActive ? 'text-emerald-500 hover:bg-emerald-50' : 'text-slate-300 hover:bg-white/5'}`}>
                     {c.isActive ? <ToggleRight size={24} /> : <ToggleLeft size={24} />}
                   </button>
-                  <button onClick={() => handleOpenEdit(c)} className="p-1.5 text-gray-500 hover:text-primary rounded-lg hover:bg-gray-100 transition-colors">
+                  <button onClick={() => handleOpenEdit(c)} className="p-1.5 text-slate-300 hover:text-primary rounded-lg hover:bg-white/5 transition-colors">
                     <Edit size={16} />
                   </button>
-                  <button onClick={() => setConfigToDelete(c)} className="p-1.5 text-gray-500 hover:text-red-500 rounded-lg hover:bg-gray-100 transition-colors">
+                  <button onClick={() => setConfigToDelete(c)} className="p-1.5 text-slate-300 hover:text-red-500 rounded-lg hover:bg-white/5 transition-colors">
                     <Trash2 size={16} />
                   </button>
                 </div>

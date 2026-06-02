@@ -40,8 +40,8 @@ export default function AdminDashboardPage() {
           <Card key={s.label} className="flex items-center gap-4">
             <div className={`w-12 h-12 rounded-xl ${s.bg} flex items-center justify-center`}><s.icon size={24} className={s.color} /></div>
             <div>
-              <p className="text-sm text-gray-500">{s.label}</p>
-              <p className="text-xl font-bold text-gray-900">{s.value}</p>
+              <p className="text-sm text-slate-300">{s.label}</p>
+              <p className="text-xl font-bold text-white">{s.value}</p>
             </div>
           </Card>
         ))}
@@ -50,7 +50,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Distribution par Situation Professionnelle */}
         <Card>
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">Distribution par Statut Professionnel</h3>
+          <h3 className="text-sm font-semibold text-slate-200 mb-4">Distribution par Statut Professionnel</h3>
           <div className="h-[280px]">
             {Object.keys(professionalStatusDistribution || {}).length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -70,7 +70,7 @@ export default function AdminDashboardPage() {
 
         {/* Distribution par Sexe */}
         <Card>
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">Distribution par Genre</h3>
+          <h3 className="text-sm font-semibold text-slate-200 mb-4">Distribution par Genre</h3>
           <div className="h-[280px]">
             {Object.keys(genderDistribution || {}).length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -100,18 +100,18 @@ export default function AdminDashboardPage() {
       {/* Cartes d'analyses administratives */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="border-l-4 border-l-red-500">
-          <h4 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-2">Moyenne globale des Dépenses</h4>
+          <h4 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-2">Moyenne globale des Dépenses</h4>
           <p className="text-3xl font-extrabold text-red-500">{formatCurrency(averageExpense)}</p>
-          <p className="text-xs text-gray-400 mt-2">Dépenses moyennes consolidées sur l'ensemble des comptes actifs de la plateforme.</p>
+          <p className="text-xs text-slate-300 mt-2">Dépenses moyennes consolidées sur l'ensemble des comptes actifs de la plateforme.</p>
         </Card>
 
         <Card className="border-l-4 border-l-[#2E5FA3]">
-          <h4 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-2">Status de la Plateforme</h4>
+          <h4 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-2">Status de la Plateforme</h4>
           <div className="flex items-center gap-2 text-emerald-600 mt-1">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="font-semibold text-sm">Tous les services opérationnels</span>
           </div>
-          <p className="text-xs text-gray-400 mt-4">Version de l'API : 1.0.0-RELEASE • Base de données : Connectée</p>
+          <p className="text-xs text-slate-300 mt-4">Version de l'API : 1.0.0-RELEASE • Base de données : Connectée</p>
         </Card>
       </div>
     </div>
