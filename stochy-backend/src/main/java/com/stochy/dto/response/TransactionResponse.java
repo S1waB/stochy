@@ -28,6 +28,8 @@ public class TransactionResponse {
     private Boolean isRecurring;
     private String frequency;
     private Integer recurrenceDay;
+    private Boolean autoProcess;
+    private LocalDate lastProcessedDate;
     private LocalDate transactionDate;
     private String attachmentUrl;
     private String notes;

@@ -55,12 +55,17 @@ public class TransactionService {
                 .amount(request.getAmount())
                 .type(TransactionType.valueOf(request.getType()))
                 .isRecurring(request.getIsRecurring() != null && request.getIsRecurring())
+                .autoProcess(request.getAutoProcess() != null && request.getAutoProcess())
                 .build();
 
         if (request.getTransactionDate() != null && !request.getTransactionDate().isBlank()) {
             transaction.setTransactionDate(LocalDate.parse(request.getTransactionDate()));
         } else {
             transaction.setTransactionDate(LocalDate.now());
+        }
+
+        if (transaction.getIsRecurring() && transaction.getAutoProcess()) {
+            transaction.setLastProcessedDate(transaction.getTransactionDate());
         }
 
         if (request.getExpenseType() != null) transaction.setExpenseType(ExpenseType.valueOf(request.getExpenseType()));
@@ -201,9 +206,18 @@ public class TransactionService {
         transaction.setPriority(request.getPriority());
         transaction.setNotes(request.getNotes());
         transaction.setIsRecurring(request.getIsRecurring() != null && request.getIsRecurring());
+        transaction.setAutoProcess(request.getAutoProcess() != null && request.getAutoProcess());
 
         if (request.getTransactionDate() != null && !request.getTransactionDate().isBlank()) {
             transaction.setTransactionDate(LocalDate.parse(request.getTransactionDate()));
+        }
+
+        if (transaction.getIsRecurring() && transaction.getAutoProcess()) {
+            if (transaction.getLastProcessedDate() == null) {
+                transaction.setLastProcessedDate(transaction.getTransactionDate());
+            }
+        } else {
+            transaction.setLastProcessedDate(null);
         }
 
         if (request.getCategoryId() != null) {
@@ -243,6 +257,8 @@ public class TransactionService {
                 .isRecurring(t.getIsRecurring())
                 .frequency(t.getFrequency() != null ? t.getFrequency().name() : null)
                 .recurrenceDay(t.getRecurrenceDay())
+                .autoProcess(t.getAutoProcess())
+                .lastProcessedDate(t.getLastProcessedDate())
                 .transactionDate(t.getTransactionDate())
                 .attachmentUrl(t.getAttachmentUrl())
                 .notes(t.getNotes())

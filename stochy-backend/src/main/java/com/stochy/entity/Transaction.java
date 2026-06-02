@@ -70,6 +70,13 @@ public class Transaction {
     @Column(name = "recurrence_day")
     private Integer recurrenceDay;
 
+    @Column(name = "auto_process", nullable = false)
+    @Builder.Default
+    private Boolean autoProcess = false;
+
+    @Column(name = "last_processed_date")
+    private LocalDate lastProcessedDate;
+
     @Column(name = "transaction_date")
     private LocalDate transactionDate;
 

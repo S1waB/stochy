@@ -32,6 +32,7 @@ public class TransactionRequest {
     private Boolean isRecurring;
     private String frequency;
     private Integer recurrenceDay;
+    private Boolean autoProcess;
     private String transactionDate;
     private String notes;
     private UUID loanId;
