@@ -29,11 +29,13 @@ public class TransactionService {
     private final SavingConfigRepository savingConfigRepository;
     private final BudgetRepository budgetRepository;
     private final NotificationService notificationService;
+    private final RecurringTransactionScheduler recurringTransactionScheduler;
 
     public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository,
                               CategoryRepository categoryRepository, LoanRepository loanRepository,
                               DebtRepository debtRepository, SavingConfigRepository savingConfigRepository,
-                              BudgetRepository budgetRepository, NotificationService notificationService) {
+                              BudgetRepository budgetRepository, NotificationService notificationService,
+                              RecurringTransactionScheduler recurringTransactionScheduler) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
@@ -42,6 +44,7 @@ public class TransactionService {
         this.savingConfigRepository = savingConfigRepository;
         this.budgetRepository = budgetRepository;
         this.notificationService = notificationService;
+        this.recurringTransactionScheduler = recurringTransactionScheduler;
     }
 
     @Transactional
@@ -62,10 +65,6 @@ public class TransactionService {
             transaction.setTransactionDate(LocalDate.parse(request.getTransactionDate()));
         } else {
             transaction.setTransactionDate(LocalDate.now());
-        }
-
-        if (transaction.getIsRecurring() && transaction.getAutoProcess()) {
-            transaction.setLastProcessedDate(transaction.getTransactionDate());
         }
 
         if (request.getExpenseType() != null) transaction.setExpenseType(ExpenseType.valueOf(request.getExpenseType()));
@@ -96,6 +95,10 @@ public class TransactionService {
         }
 
         transaction = transactionRepository.save(transaction);
+
+        if (transaction.getIsRecurring() && transaction.getAutoProcess()) {
+            recurringTransactionScheduler.processRecurringTemplate(transaction);
+        }
 
         // INCOME: auto-saving percentage
         if (transaction.getType() == TransactionType.INCOME) {
@@ -212,11 +215,7 @@ public class TransactionService {
             transaction.setTransactionDate(LocalDate.parse(request.getTransactionDate()));
         }
 
-        if (transaction.getIsRecurring() && transaction.getAutoProcess()) {
-            if (transaction.getLastProcessedDate() == null) {
-                transaction.setLastProcessedDate(transaction.getTransactionDate());
-            }
-        } else {
+        if (!transaction.getIsRecurring() || !transaction.getAutoProcess()) {
             transaction.setLastProcessedDate(null);
         }
 
@@ -227,6 +226,11 @@ public class TransactionService {
         }
 
         transaction = transactionRepository.save(transaction);
+
+        if (transaction.getIsRecurring() && transaction.getAutoProcess()) {
+            recurringTransactionScheduler.processRecurringTemplate(transaction);
+        }
+
         return mapToResponse(transaction);
     }
 

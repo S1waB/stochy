@@ -71,6 +71,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     List<Transaction> findByUserIdAndIsRecurringTrueAndType(UUID userId, TransactionType type);
 
+    List<Transaction> findByIsRecurringTrueAndAutoProcessTrue();
+
     @Query("SELECT t FROM Transaction t WHERE t.user.id = :userId AND t.isRecurring = true " +
             "ORDER BY t.recurrenceDay ASC")
     List<Transaction> findUpcomingRecurring(@Param("userId") UUID userId);

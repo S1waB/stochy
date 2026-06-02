@@ -87,6 +87,7 @@ C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\enums\Role.java
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\dto\response\CategoryResponse.java
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\enums\LoanType.java
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\dto\request\ChangePasswordRequest.java
+C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\service\RecurringTransactionScheduler.java
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\service\CategoryService.java
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\enums\IncomeType.java
 C:\xampp\htdocs\stochy\stochy-backend\src\main\java\com\stochy\security\JwtTokenProvider.java

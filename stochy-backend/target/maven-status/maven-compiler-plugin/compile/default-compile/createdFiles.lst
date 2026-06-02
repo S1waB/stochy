@@ -77,6 +77,7 @@ com\stochy\dto\response\CashFlowForecastResponse$ForecastMonth.class
 com\stochy\dto\response\DashboardResponse$SavingsBalanceInfo.class
 com\stochy\dto\response\AdminDashboardResponse$UsersStats.class
 com\stochy\dto\response\DashboardResponse$UpcomingTransaction$UpcomingTransactionBuilder.class
+com\stochy\service\RecurringTransactionScheduler.class
 com\stochy\entity\Address$AddressBuilder.class
 com\stochy\dto\response\UserResponse$AddressResponse$AddressResponseBuilder.class
 com\stochy\enums\Role.class
@@ -128,6 +129,7 @@ com\stochy\service\EmailService.class
 com\stochy\repository\UserRepository.class
 com\stochy\dto\response\AdminDashboardResponse$FinancialStats.class
 com\stochy\enums\MaritalStatus.class
+com\stochy\service\RecurringTransactionScheduler$1.class
 com\stochy\repository\SavingGoalRepository.class
 com\stochy\dto\response\ErrorResponse$ErrorResponseBuilder.class
 com\stochy\controller\LoanController.class

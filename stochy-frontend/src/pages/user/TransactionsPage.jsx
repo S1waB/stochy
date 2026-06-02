@@ -13,7 +13,7 @@ import EmptyState from '../../components/common/EmptyState';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { formatCurrency, formatDate } from '../../utils/formatters';
-import { TRANSACTION_TYPES, EXPENSE_TYPES, INCOME_TYPES, SCOPES } from '../../utils/constants';
+import { TRANSACTION_TYPES, EXPENSE_TYPES, INCOME_TYPES, SCOPES, FREQUENCIES } from '../../utils/constants';
 import toast from 'react-hot-toast';
 import { Plus, Filter, Upload, FileText, Edit, Trash2 } from 'lucide-react';
 import api from '../../api/axios';
@@ -67,7 +67,8 @@ export default function TransactionsPage() {
     setEditingTx(null);
     reset({
       title: '', amount: '', type: 'EXPENSE', transactionDate: new Date().toISOString().split('T')[0],
-      categoryId: '', scope: 'PERSONAL', isRecurring: false, recurrenceDay: '', notes: ''
+      categoryId: '', scope: 'PERSONAL', isRecurring: false, autoProcess: false,
+      frequency: 'MONTHLY', recurrenceDay: '', notes: ''
     });
     setIsAddOpen(true);
   };
@@ -79,7 +80,8 @@ export default function TransactionsPage() {
       transactionDate: tx.transactionDate, categoryId: tx.categoryId || '',
       expenseType: tx.expenseType || 'NORMAL', incomeType: tx.incomeType || 'SALARY',
       scope: tx.scope || 'PERSONAL', isRecurring: tx.isRecurring,
-      recurrenceDay: tx.recurrenceDay || '', notes: tx.notes || ''
+      autoProcess: tx.autoProcess || false,
+      frequency: tx.frequency || 'MONTHLY', recurrenceDay: tx.recurrenceDay || '', notes: tx.notes || ''
     });
     setIsAddOpen(true);
   };
@@ -226,14 +228,30 @@ export default function TransactionsPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <Select label="Portée" options={Object.entries(SCOPES).map(([k, v]) => ({ value: k, label: v }))} {...register('scope')} />
-            <div className="flex items-center gap-2 pt-8">
-              <input type="checkbox" id="isRecurring" {...register('isRecurring')} className="rounded border-gray-300 text-primary focus:ring-primary" />
-              <label htmlFor="isRecurring" className="text-sm font-medium text-gray-700">Récurrent</label>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 pt-8">
+                <input type="checkbox" id="isRecurring" {...register('isRecurring')} className="rounded border-gray-300 text-primary focus:ring-primary" />
+                <label htmlFor="isRecurring" className="text-sm font-medium text-gray-700">Récurrent</label>
+              </div>
+              {watch('isRecurring') && (
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" id="autoProcess" {...register('autoProcess')} className="rounded border-gray-300 text-primary focus:ring-primary" />
+                  <label htmlFor="autoProcess" className="text-sm font-medium text-gray-700">Traiter automatiquement à la date</label>
+                </div>
+              )}
             </div>
           </div>
 
           {watch('isRecurring') && (
-            <Input label="Jour de récurrence (1-28)" type="number" {...register('recurrenceDay', { min: 1, max: 28 })} />
+            <div className="grid grid-cols-2 gap-3">
+              <Select
+                label="Fréquence"
+                options={Object.entries(FREQUENCIES).map(([k, v]) => ({ value: k, label: v }))}
+                {...register('frequency', { required: 'Fréquence obligatoire' })}
+                error={errors.frequency?.message}
+              />
+              <Input label="Jour de récurrence (1-28)" type="number" {...register('recurrenceDay', { min: 1, max: 28 })} />
+            </div>
           )}
 
           <Input label="Notes" {...register('notes')} />
