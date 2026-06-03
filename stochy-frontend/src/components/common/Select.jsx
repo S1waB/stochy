@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 const Select = forwardRef(({ label, error, options = [], placeholder, className = '', ...props }, ref) => (
   <div className="w-full">
-    {label && <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>}
+    {label && <label className="block text-sm font-medium text-[var(--text-color)]/70 mb-1.5">{label}</label>}
     <select ref={ref} className={`input-field ${error ? 'border-red-400' : ''} ${className}`} {...props}>
       {placeholder && <option value="">{placeholder}</option>}
       {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}

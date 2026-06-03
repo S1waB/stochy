@@ -157,6 +157,11 @@ body {
     color: var(--text-color);
   }
 
+  select.input-field option {
+    background-color: var(--surface-bg);
+    color: var(--text-color);
+  }
+
   .badge {
     @apply inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-200;
   }
