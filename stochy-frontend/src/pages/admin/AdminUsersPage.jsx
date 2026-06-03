@@ -97,9 +97,18 @@ export default function AdminUsersPage() {
 
   const columns = [
     { key: 'name', label: 'Utilisateur', render: (row) => (
-      <div>
-        <p className="font-semibold text-gray-900">{row.firstName} {row.lastName}</p>
-        <p className="text-xs text-gray-400">{row.email}</p>
+      <div className="flex items-center gap-3">
+        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm overflow-hidden border border-gray-200">
+          {row.profilePicUrl ? (
+            <img src={`http://localhost:8080${row.profilePicUrl}`} alt={`${row.firstName} ${row.lastName}`} className="w-full h-full object-cover" />
+          ) : (
+            `${row.firstName?.[0] || ''}${row.lastName?.[0] || ''}`.toUpperCase() || 'U'
+          )}
+        </div>
+        <div>
+          <p className="font-semibold text-gray-900">{row.firstName} {row.lastName}</p>
+          <p className="text-xs text-gray-400">{row.email}</p>
+        </div>
       </div>
     )},
     { key: 'role', label: 'Rôle', render: (row) => (

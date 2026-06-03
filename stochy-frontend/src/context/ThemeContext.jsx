@@ -8,8 +8,11 @@ export function ThemeProvider({ children }) {
   });
 
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'dark') root.classList.add('dark'); else root.classList.remove('dark');
+    const html = document.documentElement;
+    html.classList.toggle('dark', theme === 'dark');
+    html.classList.toggle('light', theme === 'light');
+    html.dataset.theme = theme;
+    html.style.colorScheme = theme;
     try { localStorage.setItem('stochy_theme', theme); } catch (e) {}
   }, [theme]);
 

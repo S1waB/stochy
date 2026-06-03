@@ -17,8 +17,10 @@ import { TRANSACTION_TYPES, EXPENSE_TYPES, INCOME_TYPES, SCOPES, FREQUENCIES } f
 import toast from 'react-hot-toast';
 import { Plus, Filter, Upload, FileText, Edit, Trash2 } from 'lucide-react';
 import api from '../../api/axios';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function TransactionsPage() {
+  const { t } = useLanguage();
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +59,7 @@ export default function TransactionsPage() {
       setTransactions(res.data.content);
       setTotalPages(res.data.totalPages);
     } catch {
-      toast.error('Erreur de chargement des transactions');
+      toast.error(t('Erreur de chargement des transactions'));
     } finally {
       setLoading(false);
     }
@@ -90,15 +92,15 @@ export default function TransactionsPage() {
     try {
       if (editingTx) {
         await txApi.updateTransaction(editingTx.id, data);
-        toast.success('Transaction modifiée !');
+        toast.success(t('Transaction modifiée !'));
       } else {
         await txApi.createTransaction(data);
-        toast.success('Transaction ajoutée !');
+        toast.success(t('Transaction ajoutée !'));
       }
       setIsAddOpen(false);
       fetchTransactions();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Erreur lors de la sauvegarde');
+      toast.error(err.response?.data?.message || t('Erreur lors de la sauvegarde'));
     }
   };
 
@@ -106,10 +108,10 @@ export default function TransactionsPage() {
     if (!txToDelete) return;
     try {
       await txApi.deleteTransaction(txToDelete.id);
-      toast.success('Transaction supprimée !');
+      toast.success(t('Transaction supprimée !'));
       fetchTransactions();
     } catch {
-      toast.error('Erreur lors de la suppression');
+      toast.error(t('Erreur lors de la suppression'));
     }
   };
 
@@ -122,22 +124,22 @@ export default function TransactionsPage() {
       const res = await api.post('/csv/import', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      toast.success(`${res.data.imported} transactions importées avec succès !`);
+      toast.success(`${res.data.imported} ${t('transactions importées avec succès !')}`);
       setIsImportOpen(false);
       fetchTransactions();
     } catch {
-      toast.error('Erreur de traitement du fichier CSV');
+      toast.error(t('Erreur de traitement du fichier CSV'));
     }
   };
 
   const columns = [
-    { key: 'title', label: 'Titre', render: (row) => (
+    { key: 'title', label: t('Titre'), render: (row) => (
       <div>
         <p className="font-semibold text-white">{row.title}</p>
         {row.notes && <p className="text-xs text-slate-300 mt-0.5">{row.notes}</p>}
       </div>
     )},
-    { key: 'amount', label: 'Montant', render: (row) => {
+    { key: 'amount', label: t('Montant'), render: (row) => {
       const isIncome = row.type === 'INCOME';
       return (
         <span className={`font-bold ${isIncome ? 'text-emerald-600' : 'text-red-500'}`}>
@@ -145,13 +147,13 @@ export default function TransactionsPage() {
         </span>
       );
     }},
-    { key: 'categoryName', label: 'Catégorie', render: (row) => (
+    { key: 'categoryName', label: t('Catégorie'), render: (row) => (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: `${row.categoryColor}15`, color: row.categoryColor || '#6B7280' }}>
-        {row.categoryName || 'Autre'}
+        {t(row.categoryName) || t('Autre')}
       </span>
     )},
-    { key: 'transactionDate', label: 'Date', render: (row) => formatDate(row.transactionDate) },
-    { key: 'actions', label: 'Actions', render: (row) => (
+    { key: 'transactionDate', label: t('Date'), render: (row) => formatDate(row.transactionDate) },
+    { key: 'actions', label: t('Actions'), render: (row) => (
         <div className="flex gap-2 justify-end" onClick={e => e.stopPropagation()}>
         <button onClick={() => handleOpenEdit(row)} className="p-1 text-slate-300 hover:text-primary-light rounded-lg hover:bg-white/5 transition-colors">
           <Edit size={16} />
@@ -169,23 +171,23 @@ export default function TransactionsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel">
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
-            <Input placeholder="Rechercher..." value={search} onChange={e => setSearch(e.target.value)} className="w-full sm:w-64" />
+            <Input placeholder={t("Rechercher...")} value={search} onChange={e => setSearch(e.target.value)} className="w-full sm:w-64" />
           </div>
           <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="input-field w-auto">
-            <option value="">Tous les types</option>
-            {Object.entries(TRANSACTION_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            <option value="">{t("Tous les types")}</option>
+            {Object.entries(TRANSACTION_TYPES).map(([k, v]) => <option key={k} value={k}>{t(v)}</option>)}
           </select>
           <select value={catFilter} onChange={e => setCatFilter(e.target.value)} className="input-field w-auto">
-            <option value="">Toutes les catégories</option>
-            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            <option value="">{t("Toutes les catégories")}</option>
+            {categories.map(c => <option key={c.id} value={c.id}>{t(c.name)}</option>)}
           </select>
         </div>
           <div className="flex gap-2 w-full sm:w-auto">
           <Button variant="outline" onClick={() => setIsImportOpen(true)} className="flex-1 sm:flex-none">
-            <Upload size={16} /> CSV
+            <Upload size={16} /> {t('CSV')}
           </Button>
           <Button onClick={handleOpenAdd} className="flex-1 sm:flex-none">
-            <Plus size={16} /> Ajouter
+            <Plus size={16} /> {t('Ajouter')}
           </Button>
         </div>
       </div>
@@ -200,43 +202,43 @@ export default function TransactionsPage() {
             <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
           </>
         ) : (
-          <EmptyState title="Aucune transaction" message="Commencez par ajouter des entrées ou des dépenses." />
+          <EmptyState title={t("Aucune transaction")} message={t("Commencez par ajouter des entrées ou des dépenses.")} />
         )}
       </Card>
 
       {/* Modal d'ajout / modification */}
-      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title={editingTx ? 'Modifier la transaction' : 'Nouvelle transaction'}>
+      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title={editingTx ? t('Modifier la transaction') : t('Nouvelle transaction')}>
         <form onSubmit={handleSubmit(handleSave)} className="space-y-4">
-          <Input label="Titre" {...register('title', { required: 'Titre obligatoire' })} error={errors.title?.message} />
+          <Input label={t("Titre")} {...register('title', { required: t('Titre obligatoire') })} error={errors.title?.message} />
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Montant" type="number" step="0.01" {...register('amount', { required: 'Montant obligatoire', min: { value: 0.01, message: 'Doit être supérieur à 0' } })} error={errors.amount?.message} />
-            <Input label="Date" type="date" {...register('transactionDate', { required: 'Date obligatoire' })} error={errors.transactionDate?.message} />
+            <Input label={t("Montant")} type="number" step="0.01" {...register('amount', { required: t('Montant obligatoire'), min: { value: 0.01, message: t('Doit être supérieur à 0') } })} error={errors.amount?.message} />
+            <Input label={t("Date")} type="date" {...register('transactionDate', { required: t('Date obligatoire') })} error={errors.transactionDate?.message} />
           </div>
           
           <div className="grid grid-cols-2 gap-3">
-            <Select label="Type" options={Object.entries(TRANSACTION_TYPES).map(([k, v]) => ({ value: k, label: v }))} {...register('type')} />
-            <Select label="Catégorie" options={categories.filter(c => c.transactionType === txType).map(c => ({ value: c.id, label: c.name }))} placeholder="Choisir la catégorie" {...register('categoryId')} />
+            <Select label={t("Type")} options={Object.entries(TRANSACTION_TYPES).map(([k, v]) => ({ value: k, label: t(v) }))} {...register('type')} />
+            <Select label={t("Catégorie")} options={categories.filter(c => c.transactionType === txType).map(c => ({ value: c.id, label: t(c.name) }))} placeholder={t("Choisir la catégorie")} {...register('categoryId')} />
           </div>
 
           {txType === 'EXPENSE' && (
-            <Select label="Type de dépense" options={Object.entries(EXPENSE_TYPES).map(([k, v]) => ({ value: k, label: v }))} {...register('expenseType')} />
+            <Select label={t("Type de dépense")} options={Object.entries(EXPENSE_TYPES).map(([k, v]) => ({ value: k, label: t(v) }))} {...register('expenseType')} />
           )}
 
           {txType === 'INCOME' && (
-            <Select label="Type de revenu" options={Object.entries(INCOME_TYPES).map(([k, v]) => ({ value: k, label: v }))} {...register('incomeType')} />
+            <Select label={t("Type de revenu")} options={Object.entries(INCOME_TYPES).map(([k, v]) => ({ value: k, label: t(v) }))} {...register('incomeType')} />
           )}
 
           <div className="grid grid-cols-2 gap-3">
-            <Select label="Portée" options={Object.entries(SCOPES).map(([k, v]) => ({ value: k, label: v }))} {...register('scope')} />
+            <Select label={t("Portée")} options={Object.entries(SCOPES).map(([k, v]) => ({ value: k, label: t(v) }))} {...register('scope')} />
             <div className="space-y-3">
               <div className="flex items-center gap-2 pt-8">
                 <input type="checkbox" id="isRecurring" {...register('isRecurring')} className="rounded border-gray-300 text-primary focus:ring-primary" />
-                <label htmlFor="isRecurring" className="text-sm font-medium text-gray-700">Récurrent</label>
+                <label htmlFor="isRecurring" className="text-sm font-medium text-gray-700">{t('Récurrent')}</label>
               </div>
               {watch('isRecurring') && (
                 <div className="flex items-center gap-2">
                   <input type="checkbox" id="autoProcess" {...register('autoProcess')} className="rounded border-gray-300 text-primary focus:ring-primary" />
-                  <label htmlFor="autoProcess" className="text-sm font-medium text-gray-700">Traiter automatiquement à la date</label>
+                  <label htmlFor="autoProcess" className="text-sm font-medium text-gray-700">{t('Traiter automatiquement à la date')}</label>
                 </div>
               )}
             </div>
@@ -245,42 +247,42 @@ export default function TransactionsPage() {
           {watch('isRecurring') && (
             <div className="grid grid-cols-2 gap-3">
               <Select
-                label="Fréquence"
-                options={Object.entries(FREQUENCIES).map(([k, v]) => ({ value: k, label: v }))}
-                {...register('frequency', { required: 'Fréquence obligatoire' })}
+                label={t("Fréquence")}
+                options={Object.entries(FREQUENCIES).map(([k, v]) => ({ value: k, label: t(v) }))}
+                {...register('frequency', { required: t('Fréquence obligatoire') })}
                 error={errors.frequency?.message}
               />
-              <Input label="Jour de récurrence (1-28)" type="number" {...register('recurrenceDay', { min: 1, max: 28 })} />
+              <Input label={t("Jour de récurrence (1-28)")} type="number" {...register('recurrenceDay', { min: 1, max: 28 })} />
             </div>
           )}
 
-          <Input label="Notes" {...register('notes')} />
+          <Input label={t("Notes")} {...register('notes')} />
 
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Annuler</Button>
-            <Button type="submit">{editingTx ? 'Enregistrer' : 'Ajouter'}</Button>
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>{t('Annuler')}</Button>
+            <Button type="submit">{editingTx ? t('Enregistrer') : t('Ajouter')}</Button>
           </div>
         </form>
       </Modal>
 
       {/* Modal d'import CSV */}
-      <Modal isOpen={isImportOpen} onClose={() => setIsImportOpen(false)} title="Importer des transactions via CSV" size="sm">
+      <Modal isOpen={isImportOpen} onClose={() => setIsImportOpen(false)} title={t("Importer des transactions via CSV")} size="sm">
         <div className="space-y-4 text-center">
           <p className="text-sm text-gray-500">
-            Téléchargez un fichier CSV contenant les colonnes suivantes dans l'ordre :
-            <br /><strong>Titre, Montant, Type (EXPENSE/INCOME/SAVING), Catégorie, Date (AAAA-MM-JJ), Notes, EstRécurrent (true/false)</strong>
+            {t("Téléchargez un fichier CSV contenant les colonnes suivantes dans l'ordre :")}
+            <br /><strong>{t('Titre')}, {t('Montant')}, {t('Type')} (EXPENSE/INCOME/SAVING), {t('Catégorie')}, {t('Date')} (AAAA-MM-JJ), {t('Notes')}, {t('Récurrent')} (true/false)</strong>
           </p>
           <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 cursor-pointer hover:border-primary/50 transition-colors relative">
             <input type="file" accept=".csv" onChange={handleImportCsv} className="absolute inset-0 opacity-0 cursor-pointer" />
             <Upload size={32} className="text-gray-400 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-600">Cliquez pour choisir un fichier ou déposez-le ici</p>
+            <p className="text-sm font-medium text-gray-600">{t("Cliquez pour choisir un fichier ou déposez-le ici")}</p>
           </div>
-          <Button variant="outline" onClick={() => setIsImportOpen(false)} className="w-full">Annuler</Button>
+          <Button variant="outline" onClick={() => setIsImportOpen(false)} className="w-full">{t('Annuler')}</Button>
         </div>
       </Modal>
 
       {/* Boîte de dialogue de confirmation de suppression */}
-      <ConfirmDialog isOpen={!!txToDelete} onClose={() => setTxToDelete(null)} onConfirm={handleDelete} message={`Voulez-vous vraiment supprimer la transaction "${txToDelete?.title}" ?`} />
+      <ConfirmDialog isOpen={!!txToDelete} onClose={() => setTxToDelete(null)} onConfirm={handleDelete} message={`${t('Voulez-vous vraiment supprimer la transaction')} "${txToDelete?.title}" ?`} />
     </div>
   );
 }

@@ -9,9 +9,7 @@ import { Toaster } from 'react-hot-toast';
 import AppLayout from './components/layout/AppLayout';
 import AuthLayout from './components/layout/AuthLayout';
 
-// Pages - Auth
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
+// Pages - Auth (Login & Register are embedded inside AuthLayout flip card)
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 
 // Pages - User
@@ -39,6 +37,12 @@ function PrivateRoute({ children, adminOnly = false }) {
   return children;
 }
 
+function RootRedirect() {
+  const { isAuthenticated, isAdmin } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return isAdmin ? <Navigate to="/admin/dashboard" replace /> : <Navigate to="/dashboard" replace />;
+}
+
 export default function App() {
   return (
     <ThemeProvider>
@@ -48,14 +52,20 @@ export default function App() {
         <Router>
           <Routes>
             {/* Redirection par défaut */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<RootRedirect />} />
 
-            {/* Routes d'authentification */}
-            <Route element={<AuthLayout />}>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            </Route>
+            {/* Auth routes — /login & /register share the AuthLayout flip card */}
+            <Route path="/login" element={<AuthLayout />} />
+            <Route path="/register" element={<AuthLayout />} />
+
+            {/* Forgot password — standalone minimal page */}
+            <Route path="/forgot-password" element={
+              <div className="min-h-screen flex items-center justify-center bg-[var(--page-bg)] p-4">
+                <div className="w-full max-w-md rounded-3xl border border-[var(--surface-border)] bg-[var(--surface-bg)]/95 backdrop-blur-xl shadow-2xl overflow-hidden">
+                  <ForgotPasswordPage />
+                </div>
+              </div>
+            } />
 
             {/* Routes privées utilisateur */}
             <Route element={<PrivateRoute><AppLayout /></PrivateRoute>}>
@@ -78,7 +88,7 @@ export default function App() {
             </Route>
 
             {/* Page non trouvée */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<RootRedirect />} />
           </Routes>
         </Router>
         <Toaster position="top-right" toastOptions={{ duration: 4000, style: { background: '#333', color: '#fff' } }} />

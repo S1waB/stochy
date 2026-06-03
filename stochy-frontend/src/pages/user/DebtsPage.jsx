@@ -12,8 +12,10 @@ import { formatCurrency, formatDate } from '../../utils/formatters';
 import { DEBT_STATUSES } from '../../utils/constants';
 import toast from 'react-hot-toast';
 import { Plus, User, Calendar, CreditCard, ChevronRight, Trash2 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function DebtsPage() {
+  const { t } = useLanguage();
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDebt, setSelectedDebt] = useState(null);
@@ -36,7 +38,7 @@ export default function DebtsPage() {
       const res = await debtApi.getDebts();
       setDebts(res.data);
     } catch {
-      toast.error('Erreur lors du chargement des dettes');
+      toast.error(t('Erreur lors du chargement des dettes'));
     } finally {
       setLoading(false);
     }
@@ -56,22 +58,22 @@ export default function DebtsPage() {
   const handleSave = async (data) => {
     try {
       await debtApi.createDebt(data);
-      toast.success('Dette enregistrée avec succès !');
+      toast.success(t('Dette enregistrée avec succès !'));
       setIsAddOpen(false);
       fetchDebts();
     } catch {
-      toast.error('Erreur lors de l\'enregistrement de la dette');
+      toast.error(t('Erreur lors de l\'enregistrement de la dette'));
     }
   };
 
   const handleRepay = async (data) => {
     try {
       await debtApi.addDebtRepayment(selectedDebt.id, data);
-      toast.success('Remboursement enregistré !');
+      toast.success(t('Remboursement enregistré !'));
       setIsRepayOpen(false);
       fetchDebts();
     } catch {
-      toast.error('Erreur lors de l\'enregistrement du remboursement');
+      toast.error(t('Erreur lors de l\'enregistrement du remboursement'));
     }
   };
 
@@ -79,10 +81,10 @@ export default function DebtsPage() {
     if (!debtToDelete) return;
     try {
       await debtApi.deleteDebt(debtToDelete.id);
-      toast.success('Dette supprimée !');
+      toast.success(t('Dette supprimée !'));
       fetchDebts();
     } catch {
-      toast.error('Erreur lors de la suppression');
+      toast.error(t('Erreur lors de la suppression'));
     }
   };
 
@@ -90,8 +92,8 @@ export default function DebtsPage() {
     <div className="space-y-6">
       {/* Barre supérieure */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-bold text-white">Dettes actives (Argent prêté)</h2>
-        <Button onClick={handleOpenAdd}><Plus size={16} /> Prêter de l'argent</Button>
+        <h2 className="text-lg font-bold text-white">{t('Dettes actives (Argent prêté)')}</h2>
+        <Button onClick={handleOpenAdd}><Plus size={16} /> {t('Prêter de l\'argent')}</Button>
       </div>
 
       {/* Liste des dettes */}
@@ -111,7 +113,7 @@ export default function DebtsPage() {
                     <div>
                       <h3 className="font-bold text-white">{d.debtorName}</h3>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold ${isSettled ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                        {DEBT_STATUSES[d.status]}
+                        {t(DEBT_STATUSES[d.status])}
                       </span>
                     </div>
                   </div>
@@ -122,26 +124,26 @@ export default function DebtsPage() {
 
                 <div className="grid grid-cols-2 gap-4 text-sm py-2">
                   <div>
-                    <span className="text-slate-300 block">Total prêté</span>
+                    <span className="text-slate-300 block">{t('Total prêté')}</span>
                     <span className="font-bold text-white">{formatCurrency(d.amountLent)}</span>
                   </div>
                   <div>
-                    <span className="text-slate-300 block">Reste à recouvrer</span>
+                    <span className="text-slate-300 block">{t('Reste à recouvrer')}</span>
                     <span className={`font-bold ${isSettled ? 'text-slate-400' : 'text-amber-400'}`}>{formatCurrency(d.remainingAmount)}</span>
                   </div>
                 </div>
 
                 <div className="text-xs text-slate-300 bg-white/5 p-3 rounded-lg flex flex-col gap-1.5">
-                  <div className="flex items-center gap-1.5"><Calendar size={14} /> Date de prêt : {formatDate(d.loanDate)}</div>
+                  <div className="flex items-center gap-1.5"><Calendar size={14} /> {t('Date de prêt :')} {formatDate(d.loanDate)}</div>
                   {d.expectedRepaymentDate && (
-                    <div className="flex items-center gap-1.5"><Calendar size={14} /> Date prévue : {formatDate(d.expectedRepaymentDate)}</div>
+                    <div className="flex items-center gap-1.5"><Calendar size={14} /> {t('Date prévue :')} {formatDate(d.expectedRepaymentDate)}</div>
                   )}
                 </div>
 
                 {/* Historique des remboursements */}
                 {d.repayments?.length > 0 && (
                   <div className="space-y-1.5">
-                    <h4 className="text-xs font-bold text-slate-300 uppercase tracking-widest">Remboursements reçus</h4>
+                    <h4 className="text-xs font-bold text-slate-300 uppercase tracking-widest">{t('Remboursements reçus')}</h4>
                     <div className="space-y-1 max-h-24 overflow-y-auto pr-1">
                       {d.repayments.map(r => (
                         <div key={r.id} className="flex justify-between text-xs text-slate-300 bg-emerald-50/50 p-2 rounded">
@@ -156,7 +158,7 @@ export default function DebtsPage() {
                 {/* Action de remboursement */}
                 {!isSettled && (
                   <Button variant="outline" className="w-full" onClick={() => handleOpenRepay(d)}>
-                    <CreditCard size={16} /> Enregistrer un remboursement
+                    <CreditCard size={16} /> {t('Enregistrer un remboursement')}
                   </Button>
                 )}
               </Card>
@@ -164,45 +166,45 @@ export default function DebtsPage() {
           })}
         </div>
       ) : (
-        <EmptyState title="Aucune dette" message="Ajoutez les prêts accordés à vos proches pour ne plus oublier d'être remboursé." />
+        <EmptyState title={t("Aucune dette")} message={t("Ajoutez les prêts accordés à vos proches pour ne plus oublier d'être remboursé.")} />
       )}
 
       {/* Modal d'ajout de dette */}
-      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Enregistrer une dette (Argent prêté)">
+      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title={t("Enregistrer une dette (Argent prêté)")}>
         <form onSubmit={handleSubmit(handleSave)} className="space-y-4">
-          <Input label="Nom de l'emprunteur / débiteur" {...register('debtorName', { required: 'Nom de l\'emprunteur obligatoire' })} error={errors.debtorName?.message} />
-          <Input label="Montant prêté" type="number" step="0.01" {...register('amountLent', { required: 'Montant obligatoire', min: { value: 0.01, message: 'Doit être supérieur à 0' } })} error={errors.amountLent?.message} />
+          <Input label={t("Nom de l'emprunteur / débiteur")} {...register('debtorName', { required: t('Nom de l\'emprunteur obligatoire') })} error={errors.debtorName?.message} />
+          <Input label={t("Montant prêté")} type="number" step="0.01" {...register('amountLent', { required: t('Montant obligatoire'), min: { value: 0.01, message: t('Doit être supérieur à 0') } })} error={errors.amountLent?.message} />
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Date du prêt" type="date" {...register('loanDate', { required: 'Date obligatoire' })} error={errors.loanDate?.message} />
-            <Input label="Date de remboursement prévue" type="date" {...register('expectedRepaymentDate')} />
+            <Input label={t("Date du prêt")} type="date" {...register('loanDate', { required: t('Date obligatoire') })} error={errors.loanDate?.message} />
+            <Input label={t("Date de remboursement prévue")} type="date" {...register('expectedRepaymentDate')} />
           </div>
-          <Input label="Notes / Conditions" {...register('notes')} />
+          <Input label={t("Notes / Conditions")} {...register('notes')} />
 
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Annuler</Button>
-            <Button type="submit">Enregistrer la dette</Button>
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>{t('Annuler')}</Button>
+            <Button type="submit">{t('Enregistrer la dette')}</Button>
           </div>
         </form>
       </Modal>
 
       {/* Modal d'ajout de remboursement */}
-      <Modal isOpen={isRepayOpen} onClose={() => setIsRepayOpen(false)} title={`Remboursement de "${selectedDebt?.debtorName}"`}>
+      <Modal isOpen={isRepayOpen} onClose={() => setIsRepayOpen(false)} title={`${t('Remboursement de')} "${selectedDebt?.debtorName}"`}>
         <form onSubmit={handleRepaySubmit(handleRepay)} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Montant reçu" type="number" step="0.01" {...registerRepay('amount', { required: 'Montant obligatoire', min: { value: 0.01, message: 'Doit être supérieur à 0' } })} error={repayErrors.amount?.message} />
-            <Input label="Date du versement" type="date" {...registerRepay('repaymentDate')} />
+            <Input label={t("Montant reçu")} type="number" step="0.01" {...registerRepay('amount', { required: t('Montant obligatoire'), min: { value: 0.01, message: t('Doit être supérieur à 0') } })} error={repayErrors.amount?.message} />
+            <Input label={t("Date du versement")} type="date" {...registerRepay('repaymentDate')} />
           </div>
-          <Input label="Notes (Mode de versement...)" {...registerRepay('notes')} />
+          <Input label={t("Notes (Mode de versement...)")} {...registerRepay('notes')} />
 
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsRepayOpen(false)}>Annuler</Button>
-            <Button type="submit">Valider le versement</Button>
+            <Button type="button" variant="outline" onClick={() => setIsRepayOpen(false)}>{t('Annuler')}</Button>
+            <Button type="submit">{t('Valider le versement')}</Button>
           </div>
         </form>
       </Modal>
 
       {/* Dialogue de suppression */}
-      <ConfirmDialog isOpen={!!debtToDelete} onClose={() => setDebtToDelete(null)} onConfirm={handleDelete} message={`Voulez-vous vraiment supprimer la dette de "${debtToDelete?.debtorName}" ?`} />
+      <ConfirmDialog isOpen={!!debtToDelete} onClose={() => setDebtToDelete(null)} onConfirm={handleDelete} message={`${t('Voulez-vous vraiment supprimer la dette de')} "${debtToDelete?.debtorName}" ?`} />
     </div>
   );
 }

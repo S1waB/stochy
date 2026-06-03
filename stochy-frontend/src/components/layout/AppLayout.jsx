@@ -1,22 +1,24 @@
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 
 const titles = {
-  '/dashboard': 'Dashboard', '/transactions': 'Transactions', '/budget': 'Budget',
-  '/savings': 'Épargne', '/goals': 'Objectifs', '/loans': 'Prêts', '/debts': 'Dettes',
-  '/forecast': 'Prévisions', '/profile': 'Mon Profil',
-  '/admin/dashboard': 'Dashboard Admin', '/admin/users': 'Gestion des utilisateurs'
+  '/dashboard': 'dashboard', '/transactions': 'transactions', '/budget': 'budget',
+  '/savings': 'savings', '/goals': 'goals', '/loans': 'loans', '/debts': 'debts',
+  '/forecast': 'forecast', '/profile': 'profile',
+  '/admin/dashboard': 'adminDashboard', '/admin/users': 'users'
 };
 
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const title = titles[location.pathname] || 'STOCHY';
+  const { t } = useLanguage();
+  const title = t(titles[location.pathname] || 'stochy');
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#040812] text-slate-100">
+    <div className="relative min-h-screen overflow-hidden bg-[var(--surface-bg)] text-[var(--text-color)]">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-24 top-20 h-72 w-72 rounded-full bg-brand-light/10 blur-3xl" />
         <div className="absolute right-0 top-24 h-72 w-72 rounded-full bg-accent/15 blur-3xl" />

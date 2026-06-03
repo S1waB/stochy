@@ -14,8 +14,10 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { formatCurrency, formatPercent } from '../../utils/formatters';
 import toast from 'react-hot-toast';
 import { Plus, Copy, Trash2, Edit } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function BudgetsPage() {
+  const { t, lang } = useLanguage();
   const [budgets, setBudgets] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +46,7 @@ export default function BudgetsPage() {
       const res = await budgetApi.getBudgetStatus(month, year);
       setBudgets(res.data);
     } catch {
-      toast.error('Erreur de chargement des budgets');
+      toast.error(t('Erreur de chargement des budgets'));
     } finally {
       setLoading(false);
     }
@@ -64,11 +66,11 @@ export default function BudgetsPage() {
   const handleSave = async (data) => {
     try {
       await budgetApi.createBudget(data);
-      toast.success('Budget configuré avec succès !');
+      toast.success(t('Budget configuré avec succès !'));
       setIsAddOpen(false);
       fetchBudgets();
     } catch {
-      toast.error('Erreur lors de la configuration du budget');
+      toast.error(t('Erreur lors de la configuration du budget'));
     }
   };
 
@@ -80,11 +82,11 @@ export default function BudgetsPage() {
         targetMonth: month,
         targetYear: year
       });
-      toast.success('Budgets dupliqués avec succès !');
+      toast.success(t('Budgets dupliqués avec succès !'));
       setIsCopyOpen(false);
       fetchBudgets();
     } catch {
-      toast.error('Erreur lors de la duplication des budgets');
+      toast.error(t('Erreur lors de la duplication des budgets'));
     }
   };
 
@@ -92,10 +94,10 @@ export default function BudgetsPage() {
     if (!budgetToDelete) return;
     try {
       await budgetApi.deleteBudget(budgetToDelete.id);
-      toast.success('Budget supprimé !');
+      toast.success(t('Budget supprimé !'));
       fetchBudgets();
     } catch {
-      toast.error('Erreur lors de la suppression');
+      toast.error(t('Erreur lors de la suppression'));
     }
   };
 
@@ -107,7 +109,7 @@ export default function BudgetsPage() {
           <select value={month} onChange={e => setMonth(+e.target.value)} className="input-field w-auto">
             {Array.from({ length: 12 }, (_, i) => (
               <option key={i + 1} value={i + 1}>
-                {['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'][i]}
+                {(lang === 'en' ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] : ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'])[i]}
               </option>
             ))}
           </select>
@@ -117,10 +119,10 @@ export default function BudgetsPage() {
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
           <Button variant="outline" onClick={() => setIsCopyOpen(true)} className="flex-1 sm:flex-none">
-            <Copy size={16} /> Dupliquer
+            <Copy size={16} /> {t('Dupliquer')}
           </Button>
           <Button onClick={() => handleOpenAdd()} className="flex-1 sm:flex-none">
-            <Plus size={16} /> Définir un budget
+            <Plus size={16} /> {t('Définir un budget')}
           </Button>
         </div>
       </div>
@@ -136,9 +138,9 @@ export default function BudgetsPage() {
               <Card key={b.budget?.id || b.categoryName} className="space-y-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-bold text-white text-lg">{b.categoryName}</h3>
+                    <h3 className="font-bold text-white text-lg">{t(b.categoryName)}</h3>
                     <p className="text-sm text-slate-300">
-                      Limite : <span className="font-semibold text-white">{formatCurrency(b.budgetedAmount)}</span>
+                      {t('Limite :')} <span className="font-semibold text-white">{formatCurrency(b.budgetedAmount)}</span>
                     </p>
                   </div>
                     <div className="flex gap-1.5" onClick={e => e.stopPropagation()}>
@@ -153,15 +155,15 @@ export default function BudgetsPage() {
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-300">Dépensé :</span>
+                    <span className="text-slate-300">{t('Dépensé :')}</span>
                     <span className={`font-semibold ${isExceeded ? 'text-red-500' : 'text-emerald-600'}`}>
                       {formatCurrency(b.spentAmount)} ({formatPercent(b.usagePercent)})
                     </span>
                   </div>
                   <ProgressBar value={b.usagePercent} />
                   <div className="flex justify-between text-xs text-slate-300">
-                    <span>Restant : {formatCurrency(b.remainingAmount)}</span>
-                    <span>Alerte à {b.budget?.alertThresholdPct || 80}%</span>
+                    <span>{t('Restant :')} {formatCurrency(b.remainingAmount)}</span>
+                    <span>{t('Alerte à')} {b.budget?.alertThresholdPct || 80}%</span>
                   </div>
                 </div>
               </Card>
@@ -169,40 +171,40 @@ export default function BudgetsPage() {
           })}
         </div>
       ) : (
-        <EmptyState title="Aucun budget défini" message="Prenez le contrôle de vos finances en fixant des limites par catégorie." />
+        <EmptyState title={t("Aucun budget défini")} message={t("Prenez le contrôle de vos finances en fixant des limites par catégorie.")} />
       )}
 
       {/* Modal d'ajout / modification */}
-      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Configurer un budget">
+      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title={t("Configurer un budget")}>
         <form onSubmit={handleSubmit(handleSave)} className="space-y-4">
-          <Select label="Catégorie" placeholder="Budget Global (Toutes catégories)" options={categories.map(c => ({ value: c.id, label: c.name }))} {...register('categoryId')} />
-          <Input label="Montant limite" type="number" step="0.01" {...register('amount', { required: 'Montant obligatoire', min: { value: 0.01, message: 'Doit être supérieur à 0' } })} error={errors.amount?.message} />
-          <Input label="Seuil d'alerte (%)" type="number" {...register('alertThresholdPct', { required: 'Seuil obligatoire', min: 1, max: 100 })} error={errors.alertThresholdPct?.message} />
+          <Select label={t("Catégorie")} placeholder={t("Budget Global (Toutes catégories)")} options={categories.map(c => ({ value: c.id, label: t(c.name) }))} {...register('categoryId')} />
+          <Input label={t("Montant limite")} type="number" step="0.01" {...register('amount', { required: t('Montant obligatoire'), min: { value: 0.01, message: t('Doit être supérieur à 0') } })} error={errors.amount?.message} />
+          <Input label={t("Seuil d'alerte (%)")} type="number" {...register('alertThresholdPct', { required: t('Seuil obligatoire'), min: 1, max: 100 })} error={errors.alertThresholdPct?.message} />
           
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Annuler</Button>
-            <Button type="submit">Enregistrer</Button>
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>{t('Annuler')}</Button>
+            <Button type="submit">{t('Enregistrer')}</Button>
           </div>
         </form>
       </Modal>
 
       {/* Modal de duplication */}
-      <Modal isOpen={isCopyOpen} onClose={() => setIsCopyOpen(false)} title="Dupliquer les budgets" size="sm">
+      <Modal isOpen={isCopyOpen} onClose={() => setIsCopyOpen(false)} title={t("Dupliquer les budgets")} size="sm">
         <form onSubmit={handleSubmitCopy(handleDuplicate)} className="space-y-4">
-          <p className="text-sm text-gray-500">Copiez les budgets d'un mois précédent vers le mois en cours ({month}/{year}).</p>
+          <p className="text-sm text-gray-500">{t("Copiez les budgets d'un mois précédent vers le mois en cours")}.</p>
           <div className="grid grid-cols-2 gap-3">
-            <Select label="Mois source" options={Array.from({ length: 12 }, (_, i) => ({ value: i + 1, label: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'][i] }))} defaultValue={month === 1 ? 12 : month - 1} {...registerCopy('sourceMonth')} />
-            <Select label="Année source" options={[2024, 2025, 2026, 2027].map(y => ({ value: y, label: y }))} defaultValue={month === 1 ? year - 1 : year} {...registerCopy('sourceYear')} />
+            <Select label={t("Mois source")} options={Array.from({ length: 12 }, (_, i) => ({ value: i + 1, label: (lang === 'en' ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] : ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'])[i] }))} defaultValue={month === 1 ? 12 : month - 1} {...registerCopy('sourceMonth')} />
+            <Select label={t("Année source")} options={[2024, 2025, 2026, 2027].map(y => ({ value: y, label: y }))} defaultValue={month === 1 ? year - 1 : year} {...registerCopy('sourceYear')} />
           </div>
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsCopyOpen(false)}>Annuler</Button>
-            <Button type="submit">Dupliquer</Button>
+            <Button type="button" variant="outline" onClick={() => setIsCopyOpen(false)}>{t('Annuler')}</Button>
+            <Button type="submit">{t('Dupliquer')}</Button>
           </div>
         </form>
       </Modal>
 
       {/* Dialogue de suppression */}
-      <ConfirmDialog isOpen={!!budgetToDelete} onClose={() => setBudgetToDelete(null)} onConfirm={handleDelete} message="Voulez-vous vraiment supprimer ce budget ?" />
+      <ConfirmDialog isOpen={!!budgetToDelete} onClose={() => setBudgetToDelete(null)} onConfirm={handleDelete} message={t("Voulez-vous vraiment supprimer ce budget ?")} />
     </div>
   );
 }

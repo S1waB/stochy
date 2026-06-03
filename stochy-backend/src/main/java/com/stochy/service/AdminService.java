@@ -2,6 +2,7 @@ package com.stochy.service;
 
 import com.stochy.dto.request.CreateAdminRequest;
 import com.stochy.dto.request.CreateUserRequest;
+import com.stochy.dto.request.UpdateUserAsAdminRequest;
 import com.stochy.dto.response.*;
 import com.stochy.entity.User;
 import com.stochy.enums.*;
@@ -143,6 +144,42 @@ public class AdminService {
             throw new BadRequestException("Rôle invalide: " + newRole);
         }
         user.setRole(role);
+        user = userRepository.save(user);
+        return userService.mapToUserResponse(user);
+    }
+
+    @Transactional
+    public UserResponse updateUserAsAdmin(UUID userId, UpdateUserAsAdminRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
+
+        if (!user.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException("L'email est déjà utilisé: " + request.getEmail());
+        }
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+
+        ProfessionalStatus ps = null;
+        if (request.getProfessionalStatus() != null && !request.getProfessionalStatus().isBlank()) {
+            try { ps = ProfessionalStatus.valueOf(request.getProfessionalStatus()); } catch (IllegalArgumentException ignored) {}
+        }
+        user.setProfessionalStatus(ps);
+
+        Gender g = null;
+        if (request.getGender() != null && !request.getGender().isBlank()) {
+            try { g = Gender.valueOf(request.getGender()); } catch (IllegalArgumentException ignored) {}
+        }
+        user.setGender(g);
+
+        MaritalStatus ms = null;
+        if (request.getMaritalStatus() != null && !request.getMaritalStatus().isBlank()) {
+            try { ms = MaritalStatus.valueOf(request.getMaritalStatus()); } catch (IllegalArgumentException ignored) {}
+        }
+        user.setMaritalStatus(ms);
+
         user = userRepository.save(user);
         return userService.mapToUserResponse(user);
     }

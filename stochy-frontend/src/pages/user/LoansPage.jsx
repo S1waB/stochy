@@ -15,8 +15,10 @@ import { formatCurrency, formatDate, formatPercent } from '../../utils/formatter
 import { LOAN_TYPES } from '../../utils/constants';
 import toast from 'react-hot-toast';
 import { Plus, Landmark, Calendar, FileText, CheckCircle, Trash2 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function LoansPage() {
+  const { t } = useLanguage();
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedLoan, setSelectedLoan] = useState(null);
@@ -39,7 +41,7 @@ export default function LoansPage() {
       const res = await loanApi.getLoans();
       setLoans(res.data);
     } catch {
-      toast.error('Erreur lors du chargement des prêts');
+      toast.error(t('Erreur lors du chargement des prêts'));
     } finally {
       setLoading(false);
     }
@@ -57,11 +59,11 @@ export default function LoansPage() {
   const handleSave = async (data) => {
     try {
       await loanApi.createLoan(data);
-      toast.success('Nouveau prêt créé !');
+      toast.success(t('Nouveau prêt créé !'));
       setIsAddOpen(false);
       fetchLoans();
     } catch {
-      toast.error('Erreur lors de la création du prêt');
+      toast.error(t('Erreur lors de la création du prêt'));
     }
   };
 
@@ -72,7 +74,7 @@ export default function LoansPage() {
       setAmortization(res.data);
       setIsAmortOpen(true);
     } catch {
-      toast.error('Erreur de chargement du tableau d\'amortissement');
+      toast.error(t('Erreur de chargement du tableau d\'amortissement'));
     }
   };
 
@@ -81,15 +83,15 @@ export default function LoansPage() {
       await loanApi.markRepaymentPaid(selectedLoan.id, {
         repaymentId: installmentId,
         paymentDate: new Date().toISOString().split('T')[0],
-        notes: 'Paiement enregistré depuis le tableau d\'amortissement.'
+        notes: t('Paiement enregistré depuis le tableau d\'amortissement.')
       });
-      toast.success('Mensualité marquée comme payée !');
+      toast.success(t('Mensualité marquée comme payée !'));
       // Refresh
       const res = await loanApi.getAmortization(selectedLoan.id);
       setAmortization(res.data);
       fetchLoans();
     } catch {
-      toast.error('Erreur lors de l\'enregistrement du paiement');
+      toast.error(t('Erreur lors de l\'enregistrement du paiement'));
     }
   };
 
@@ -97,27 +99,27 @@ export default function LoansPage() {
     if (!loanToDelete) return;
     try {
       await loanApi.deleteLoan(loanToDelete.id);
-      toast.success('Prêt supprimé !');
+      toast.success(t('Prêt supprimé !'));
       fetchLoans();
     } catch {
-      toast.error('Erreur lors de la suppression');
+      toast.error(t('Erreur lors de la suppression'));
     }
   };
 
   const amortizationColumns = [
-    { key: 'installmentNumber', label: 'N°' },
-    { key: 'dueDate', label: 'Date d\'échéance', render: (row) => formatDate(row.dueDate) },
-    { key: 'principalAmount', label: 'Capital', render: (row) => formatCurrency(row.principalAmount) },
-    { key: 'interestAmount', label: 'Intérêts', render: (row) => formatCurrency(row.interestAmount) },
-    { key: 'totalAmount', label: 'Mensualité', render: (row) => formatCurrency(row.totalAmount) },
-    { key: 'isPaid', label: 'Statut', render: (row) => (
+    { key: 'installmentNumber', label: t('N°') },
+    { key: 'dueDate', label: t('Date d\'échéance'), render: (row) => formatDate(row.dueDate) },
+    { key: 'principalAmount', label: t('Capital'), render: (row) => formatCurrency(row.principalAmount) },
+    { key: 'interestAmount', label: t('Intérêts'), render: (row) => formatCurrency(row.interestAmount) },
+    { key: 'totalAmount', label: t('Mensualité'), render: (row) => formatCurrency(row.totalAmount) },
+    { key: 'isPaid', label: t('Statut'), render: (row) => (
       row.isPaid ? (
         <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
-          Payé
+          {t('Payé')}
         </span>
       ) : (
         <Button variant="outline" className="!py-1 !px-2.5 !text-xs" onClick={() => handleMarkPaid(row.installmentNumber)}>
-          Régler
+          {t('Régler')}
         </Button>
       )
     )}
@@ -127,8 +129,8 @@ export default function LoansPage() {
     <div className="space-y-6">
       {/* Barre supérieure */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-bold text-white">Suivi des Emprunts & Dettes Financières</h2>
-        <Button onClick={handleOpenAdd}><Plus size={16} /> Nouveau prêt</Button>
+        <h2 className="text-lg font-bold text-white">{t('Suivi des Emprunts & Dettes Financières')}</h2>
+        <Button onClick={handleOpenAdd}><Plus size={16} /> {t('Nouveau prêt')}</Button>
       </div>
 
       {/* Liste des prêts */}
@@ -146,7 +148,7 @@ export default function LoansPage() {
                   <div>
                     <h3 className="text-lg font-bold text-white">{l.lenderName}</h3>
                     <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-white/5 text-slate-300">
-                      {LOAN_TYPES[l.loanType]}
+                      {t(LOAN_TYPES[l.loanType])}
                     </span>
                   </div>
                 </div>
@@ -158,8 +160,8 @@ export default function LoansPage() {
               {/* Barre de progression du remboursement */}
               <div className="space-y-1">
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>Remboursé : {formatPercent(l.progressPercent)}</span>
-                  <span>Capital restant : {formatCurrency(l.remainingCapital)} / {formatCurrency(l.initialAmount)}</span>
+                  <span>{t('Remboursé :')} {formatPercent(l.progressPercent)}</span>
+                  <span>{t('Capital restant :')} {formatCurrency(l.remainingCapital)} / {formatCurrency(l.initialAmount)}</span>
                 </div>
                 <ProgressBar value={l.progressPercent} color="bg-red-500" />
               </div>
@@ -167,20 +169,20 @@ export default function LoansPage() {
               {/* Détails financiers */}
                 <div className="grid grid-cols-2 gap-4 text-xs bg-white/5 p-4 rounded-xl">
                 <div>
-                  <p className="text-slate-300">Mensualité</p>
-                  <p className="font-bold text-white text-sm mt-0.5">{formatCurrency(l.monthlyPayment)} / mois</p>
+                  <p className="text-slate-300">{t('Mensualité')}</p>
+                  <p className="font-bold text-white text-sm mt-0.5">{formatCurrency(l.monthlyPayment)} {t('/ mois')}</p>
                 </div>
                 <div>
-                  <p className="text-slate-300">Taux d'intérêt</p>
-                  <p className="font-bold text-white text-sm mt-0.5">{l.interestRate}% ({l.isFixedRate ? 'Fixe' : 'Variable'})</p>
+                  <p className="text-slate-300">{t('Taux d\'intérêt')}</p>
+                  <p className="font-bold text-white text-sm mt-0.5">{l.interestRate}% ({l.isFixedRate ? t('Fixe') : t('Variable')})</p>
                 </div>
                 <div>
-                  <p className="text-slate-300">Total payé (Intérêts incl.)</p>
+                  <p className="text-slate-300">{t('Total payé (Intérêts incl.)')}</p>
                   <p className="font-bold text-white text-sm mt-0.5">{formatCurrency(l.totalPaid)}</p>
                 </div>
                 {l.nextDueDate && (
                   <div>
-                    <p className="text-slate-300">Prochaine échéance</p>
+                    <p className="text-slate-300">{t('Prochaine échéance')}</p>
                     <p className="font-bold text-amber-400 text-sm mt-0.5">{formatDate(l.nextDueDate)}</p>
                   </div>
                 )}
@@ -188,59 +190,59 @@ export default function LoansPage() {
 
               {/* Actions */}
               <Button variant="outline" className="w-full" onClick={() => handleShowAmortization(l)}>
-                <FileText size={16} /> Tableau d'amortissement
+                <FileText size={16} /> {t('Tableau d\'amortissement')}
               </Button>
             </Card>
           ))}
         </div>
       ) : (
-        <EmptyState title="Aucun prêt actif" message="Ajoutez vos emprunts pour suivre vos échéanciers de remboursement." />
+        <EmptyState title={t("Aucun prêt actif")} message={t("Ajoutez vos emprunts pour suivre vos échéanciers de remboursement.")} />
       )}
 
       {/* Modal d'ajout de prêt */}
-      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Créer un emprunt / prêt financier">
+      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title={t("Créer un emprunt / prêt financier")}>
         <form onSubmit={handleSubmit(handleSave)} className="space-y-4">
-          <Input label="Nom du créancier" {...register('lenderName', { required: 'Créancier obligatoire' })} error={errors.lenderName?.message} />
+          <Input label={t("Nom du créancier")} {...register('lenderName', { required: t('Créancier obligatoire') })} error={errors.lenderName?.message} />
           <div className="grid grid-cols-2 gap-3">
-            <Select label="Type de prêt" options={Object.entries(LOAN_TYPES).map(([k, v]) => ({ value: k, label: v }))} {...register('loanType')} />
-            <Input label="Date de début" type="date" {...register('startDate', { required: 'Date de début obligatoire' })} error={errors.startDate?.message} />
+            <Select label={t("Type de prêt")} options={Object.entries(LOAN_TYPES).map(([k, v]) => ({ value: k, label: t(v) }))} {...register('loanType')} />
+            <Input label={t("Date de début")} type="date" {...register('startDate', { required: t('Date de début obligatoire') })} error={errors.startDate?.message} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Capital initial" type="number" step="0.01" {...register('initialAmount', { required: 'Capital obligatoire', min: 1 })} error={errors.initialAmount?.message} />
-            <Input label="Mensualité" type="number" step="0.01" {...register('monthlyPayment', { required: 'Mensualité obligatoire', min: 1 })} error={errors.monthlyPayment?.message} />
+            <Input label={t("Capital initial")} type="number" step="0.01" {...register('initialAmount', { required: t('Capital obligatoire'), min: 1 })} error={errors.initialAmount?.message} />
+            <Input label={t("Mensualité")} type="number" step="0.01" {...register('monthlyPayment', { required: t('Mensualité obligatoire'), min: 1 })} error={errors.monthlyPayment?.message} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Taux d'intérêt (%)" type="number" step="0.01" {...register('interestRate', { required: 'Taux obligatoire', min: 0 })} error={errors.interestRate?.message} />
-            <Input label="Durée (mois)" type="number" {...register('durationMonths', { required: 'Durée obligatoire', min: 1 })} error={errors.durationMonths?.message} />
+            <Input label={t("Taux d'intérêt (%)")} type="number" step="0.01" {...register('interestRate', { required: t('Taux obligatoire'), min: 0 })} error={errors.interestRate?.message} />
+            <Input label={t("Durée (mois)")} type="number" {...register('durationMonths', { required: t('Durée obligatoire'), min: 1 })} error={errors.durationMonths?.message} />
           </div>
-          <Input label="Notes" {...register('notes')} />
+          <Input label={t("Notes")} {...register('notes')} />
 
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Annuler</Button>
-            <Button type="submit">Calculer & Générer l'échéancier</Button>
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>{t('Annuler')}</Button>
+            <Button type="submit">{t('Calculer & Générer l\'échéancier')}</Button>
           </div>
         </form>
       </Modal>
 
       {/* Modal Tableau d'amortissement */}
-      <Modal isOpen={isAmortOpen} onClose={() => setIsAmortOpen(false)} title={`Tableau d'amortissement — ${selectedLoan?.lenderName}`} size="lg">
+      <Modal isOpen={isAmortOpen} onClose={() => setIsAmortOpen(false)} title={`${t('Tableau d\'amortissement —')} ${selectedLoan?.lenderName}`} size="lg">
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-4 text-sm bg-gray-50 p-4 rounded-xl">
-            <div><p className="text-gray-500">Capital Emprunté</p><p className="font-bold text-gray-900 text-lg mt-0.5">{formatCurrency(selectedLoan?.initialAmount)}</p></div>
-            <div><p className="text-gray-500">Intérêts Remboursés</p><p className="font-bold text-gray-900 text-lg mt-0.5">{formatCurrency(selectedLoan?.totalInterestPaid)}</p></div>
-            <div><p className="text-gray-500">Reste à payer</p><p className="font-bold text-red-500 text-lg mt-0.5">{formatCurrency(selectedLoan?.remainingCapital)}</p></div>
+            <div><p className="text-gray-500">{t('Capital Emprunté')}</p><p className="font-bold text-gray-900 text-lg mt-0.5">{formatCurrency(selectedLoan?.initialAmount)}</p></div>
+            <div><p className="text-gray-500">{t('Intérêts Remboursés')}</p><p className="font-bold text-gray-900 text-lg mt-0.5">{formatCurrency(selectedLoan?.totalInterestPaid)}</p></div>
+            <div><p className="text-gray-500">{t('Reste à payer')}</p><p className="font-bold text-red-500 text-lg mt-0.5">{formatCurrency(selectedLoan?.remainingCapital)}</p></div>
           </div>
           <div className="max-h-[50vh] overflow-y-auto rounded-xl border border-gray-100">
             <Table columns={amortizationColumns} data={amortization?.schedule || []} />
           </div>
           <div className="flex justify-end pt-2">
-            <Button onClick={() => setIsAmortOpen(false)}>Fermer</Button>
+            <Button onClick={() => setIsAmortOpen(false)}>{t('Fermer')}</Button>
           </div>
         </div>
       </Modal>
 
       {/* Dialogue de suppression */}
-      <ConfirmDialog isOpen={!!loanToDelete} onClose={() => setLoanToDelete(null)} onConfirm={handleDelete} message={`Voulez-vous vraiment supprimer le prêt "${loanToDelete?.lenderName}" ?`} />
+      <ConfirmDialog isOpen={!!loanToDelete} onClose={() => setLoanToDelete(null)} onConfirm={handleDelete} message={`${t('Voulez-vous vraiment supprimer le prêt')} "${loanToDelete?.lenderName}" ?`} />
     </div>
   );
 }

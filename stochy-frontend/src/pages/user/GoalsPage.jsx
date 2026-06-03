@@ -14,8 +14,10 @@ import { formatCurrency, formatDate, formatPercent } from '../../utils/formatter
 import { FUNDING_MODES } from '../../utils/constants';
 import toast from 'react-hot-toast';
 import { Plus, PiggyBank, Calendar, Edit, Trash2 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function GoalsPage() {
+  const { t } = useLanguage();
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -39,7 +41,7 @@ export default function GoalsPage() {
       const res = await goalApi.getGoals();
       setGoals(res.data);
     } catch {
-      toast.error('Erreur lors du chargement des objectifs');
+      toast.error(t('Erreur lors du chargement des objectifs'));
     } finally {
       setLoading(false);
     }
@@ -73,26 +75,26 @@ export default function GoalsPage() {
     try {
       if (editingGoal) {
         await goalApi.updateGoal(editingGoal.id, data);
-        toast.success('Objectif modifié avec succès !');
+        toast.success(t('Objectif modifié avec succès !'));
       } else {
         await goalApi.createGoal(data);
-        toast.success('Nouvel objectif créé avec succès !');
+        toast.success(t('Nouvel objectif créé avec succès !'));
       }
       setIsAddOpen(false);
       fetchGoals();
     } catch {
-      toast.error('Erreur lors de la sauvegarde de l\'objectif');
+      toast.error(t('Erreur lors de la sauvegarde de l\'objectif'));
     }
   };
 
   const handleContribute = async (data) => {
     try {
       await goalApi.contributeToGoal(selectedGoal.id, data);
-      toast.success('Contribution enregistrée !');
+      toast.success(t('Contribution enregistrée !'));
       setIsContributeOpen(false);
       fetchGoals();
     } catch {
-      toast.error('Erreur lors de l\'enregistrement de la contribution');
+      toast.error(t('Erreur lors de l\'enregistrement de la contribution'));
     }
   };
 
@@ -100,10 +102,10 @@ export default function GoalsPage() {
     if (!goalToDelete) return;
     try {
       await goalApi.deleteGoal(goalToDelete.id);
-      toast.success('Objectif supprimé !');
+      toast.success(t('Objectif supprimé !'));
       fetchGoals();
     } catch {
-      toast.error('Erreur lors de la suppression');
+      toast.error(t('Erreur lors de la suppression'));
     }
   };
 
@@ -111,8 +113,8 @@ export default function GoalsPage() {
     <div className="space-y-6">
       {/* Barre supérieure */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-bold text-white">Suivi des Objectifs d'Épargne</h2>
-        <Button onClick={handleOpenAdd}><Plus size={16} /> Nouvel objectif</Button>
+        <h2 className="text-lg font-bold text-white">{t('Suivi des Objectifs d\'Épargne')}</h2>
+        <Button onClick={handleOpenAdd}><Plus size={16} /> {t('Nouvel objectif')}</Button>
       </div>
 
       {/* Liste des objectifs */}
@@ -124,8 +126,8 @@ export default function GoalsPage() {
             <Card key={g.id} className="space-y-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-xl font-bold text-white">{g.name}</h3>
-                  {g.description && <p className="text-sm text-slate-300 mt-1">{g.description}</p>}
+                  <h3 className="text-xl font-bold text-white">{t(g.name)}</h3>
+                  {g.description && <p className="text-sm text-slate-300 mt-1">{t(g.description)}</p>}
                 </div>
                 <div className="flex gap-1" onClick={e => e.stopPropagation()}>
                   <button onClick={() => handleOpenEdit(g)} className="p-1.5 text-gray-500 hover:text-primary rounded-lg hover:bg-gray-100 transition-colors">
@@ -141,7 +143,7 @@ export default function GoalsPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="font-semibold text-[#2E5FA3]">{formatCurrency(g.currentAmount)}</span>
-                  <span className="text-gray-400">Objectif : {formatCurrency(g.targetAmount)} ({formatPercent(g.progressPercent)})</span>
+                  <span className="text-gray-400">{t('Objectif :')} {formatCurrency(g.targetAmount)} ({formatPercent(g.progressPercent)})</span>
                 </div>
                 <ProgressBar value={g.progressPercent} color="bg-[#2E5FA3]" />
               </div>
@@ -150,14 +152,14 @@ export default function GoalsPage() {
               <div className="grid grid-cols-2 gap-3 text-xs text-slate-300 bg-white/5 p-3 rounded-lg">
                 <div className="flex items-center gap-1.5">
                   <Calendar size={14} />
-                  <span>Date cible : {g.targetDate ? formatDate(g.targetDate) : 'Aucune'}</span>
+                  <span>{t('Date cible :')} {g.targetDate ? formatDate(g.targetDate) : t('Aucune')}</span>
                 </div>
                 <div>
-                  <span>Mode : {FUNDING_MODES[g.fundingMode]}</span>
+                  <span>{t('Mode :')} {t(FUNDING_MODES[g.fundingMode])}</span>
                 </div>
                 {g.monthlyRecommended && (
                   <div className="col-span-2 text-[#2E5FA3] font-medium mt-1">
-                    Épargne recommandée : {formatCurrency(g.monthlyRecommended)} / mois
+                    {t('Épargne recommandée :')} {formatCurrency(g.monthlyRecommended)} {t('/ mois')}
                   </div>
                 )}
               </div>
@@ -166,7 +168,7 @@ export default function GoalsPage() {
               {!g.isCompleted && (
                 <div className="flex gap-2">
                   <Button variant="outline" className="w-full" onClick={() => handleOpenContribute(g)}>
-                    <PiggyBank size={16} /> Contribuer
+                    <PiggyBank size={16} /> {t('Contribuer')}
                   </Button>
                 </div>
               )}
@@ -174,45 +176,45 @@ export default function GoalsPage() {
           ))}
         </div>
       ) : (
-        <EmptyState title="Aucun objectif" message="Fixez-vous un but (Ex. fonds d'urgence, vacances) pour orienter votre épargne." />
+        <EmptyState title={t("Aucun objectif")} message={t("Fixez-vous un but (Ex. fonds d'urgence, vacances) pour orienter votre épargne.")} />
       )}
 
       {/* Modal d'ajout / modification d'objectif */}
-      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Créer un objectif d'épargne">
+      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title={t("Créer un objectif d'épargne")}>
         <form onSubmit={handleSubmit(handleSave)} className="space-y-4">
-          <Input label="Nom de l'objectif" {...register('name', { required: 'Nom obligatoire' })} error={errors.name?.message} />
-          <Input label="Description (optionnel)" {...register('description')} />
+          <Input label={t("Nom de l'objectif")} {...register('name', { required: t('Nom obligatoire') })} error={errors.name?.message} />
+          <Input label={t("Description (optionnel)")} {...register('description')} />
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Montant cible" type="number" step="0.01" {...register('targetAmount', { required: 'Montant obligatoire', min: { value: 0.01, message: 'Doit être supérieur à 0' } })} error={errors.targetAmount?.message} />
-            <Input label="Date cible" type="date" {...register('targetDate')} />
+            <Input label={t("Montant cible")} type="number" step="0.01" {...register('targetAmount', { required: t('Montant obligatoire'), min: { value: 0.01, message: t('Doit être supérieur à 0') } })} error={errors.targetAmount?.message} />
+            <Input label={t("Date cible")} type="date" {...register('targetDate')} />
           </div>
-          <Select label="Mode de financement" options={Object.entries(FUNDING_MODES).map(([k, v]) => ({ value: k, label: v }))} {...register('fundingMode')} />
+          <Select label={t("Mode de financement")} options={Object.entries(FUNDING_MODES).map(([k, v]) => ({ value: k, label: t(v) }))} {...register('fundingMode')} />
 
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Annuler</Button>
-            <Button type="submit">Sauvegarder</Button>
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>{t('Annuler')}</Button>
+            <Button type="submit">{t('Sauvegarder')}</Button>
           </div>
         </form>
       </Modal>
 
       {/* Modal de contribution */}
-      <Modal isOpen={isContributeOpen} onClose={() => setIsContributeOpen(false)} title={`Contribuer à "${selectedGoal?.name}"`}>
+      <Modal isOpen={isContributeOpen} onClose={() => setIsContributeOpen(false)} title={`${t('Contribuer à')} "${t(selectedGoal?.name)}"`}>
         <form onSubmit={handleContribSubmit(handleContribute)} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Montant" type="number" step="0.01" {...registerContrib('amount', { required: 'Montant obligatoire', min: { value: 0.01, message: 'Doit être supérieur à 0' } })} error={contribErrors.amount?.message} />
-            <Input label="Date de contribution" type="date" {...registerContrib('contributionDate')} />
+            <Input label={t("Montant")} type="number" step="0.01" {...registerContrib('amount', { required: t('Montant obligatoire'), min: { value: 0.01, message: t('Doit être supérieur à 0') } })} error={contribErrors.amount?.message} />
+            <Input label={t("Date de contribution")} type="date" {...registerContrib('contributionDate')} />
           </div>
-          <Input label="Notes" {...registerContrib('notes')} />
+          <Input label={t("Notes")} {...registerContrib('notes')} />
 
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsContributeOpen(false)}>Annuler</Button>
-            <Button type="submit">Enregistrer</Button>
+            <Button type="button" variant="outline" onClick={() => setIsContributeOpen(false)}>{t('Annuler')}</Button>
+            <Button type="submit">{t('Enregistrer')}</Button>
           </div>
         </form>
       </Modal>
 
       {/* Dialogue de suppression */}
-      <ConfirmDialog isOpen={!!goalToDelete} onClose={() => setGoalToDelete(null)} onConfirm={handleDelete} message={`Voulez-vous vraiment supprimer l'objectif "${goalToDelete?.name}" ?`} />
+      <ConfirmDialog isOpen={!!goalToDelete} onClose={() => setGoalToDelete(null)} onConfirm={handleDelete} message={`${t('Voulez-vous vraiment supprimer l\'objectif')} "${t(goalToDelete?.name)}" ?`} />
     </div>
   );
 }

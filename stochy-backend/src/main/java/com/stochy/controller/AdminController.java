@@ -2,6 +2,7 @@ package com.stochy.controller;
 
 import com.stochy.dto.request.CreateAdminRequest;
 import com.stochy.dto.request.CreateUserRequest;
+import com.stochy.dto.request.UpdateUserAsAdminRequest;
 import com.stochy.dto.response.*;
 import com.stochy.enums.Gender;
 import com.stochy.enums.ProfessionalStatus;
@@ -70,6 +71,13 @@ public class AdminController {
     @PostMapping("/users")
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(adminService.createUser(request));
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<UserResponse> updateUser(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateUserAsAdminRequest request) {
+        return ResponseEntity.ok(adminService.updateUserAsAdmin(id, request));
     }
 
     @PatchMapping("/users/{id}/role")

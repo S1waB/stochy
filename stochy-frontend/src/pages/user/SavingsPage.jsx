@@ -13,8 +13,10 @@ import { formatCurrency } from '../../utils/formatters';
 import { SAVING_MODES, FREQUENCIES, INCOME_TYPES } from '../../utils/constants';
 import toast from 'react-hot-toast';
 import { Plus, PiggyBank, Wallet, Target, ToggleLeft, ToggleRight, Trash2, Edit } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function SavingsPage() {
+  const { t } = useLanguage();
   const [configs, setConfigs] = useState([]);
   const [balance, setBalance] = useState({ totalSaved: 0, allocatedToGoals: 0, freeBalance: 0 });
   const [loading, setLoading] = useState(true);
@@ -41,7 +43,7 @@ export default function SavingsPage() {
       setConfigs(configsRes.data);
       setBalance(balanceRes.data);
     } catch {
-      toast.error('Erreur lors du chargement des données d\'épargne');
+      toast.error(t('Erreur lors du chargement des données d\'épargne'));
     } finally {
       setLoading(false);
     }
@@ -75,25 +77,25 @@ export default function SavingsPage() {
     try {
       if (editingConfig) {
         await savingApi.updateSavingConfig(editingConfig.id, data);
-        toast.success('Configuration modifiée !');
+        toast.success(t('Configuration modifiée !'));
       } else {
         await savingApi.createSavingConfig(data);
-        toast.success('Configuration créée !');
+        toast.success(t('Configuration créée !'));
       }
       setIsAddOpen(false);
       fetchData();
     } catch {
-      toast.error('Erreur lors de la sauvegarde de la configuration');
+      toast.error(t('Erreur lors de la sauvegarde de la configuration'));
     }
   };
 
   const handleToggle = async (config) => {
     try {
       await savingApi.toggleSavingConfig(config.id);
-      toast.success(config.isActive ? 'Règle désactivée !' : 'Règle activée !');
+      toast.success(config.isActive ? t('Règle désactivée !') : t('Règle activée !'));
       fetchData();
     } catch {
-      toast.error('Erreur de bascule de statut');
+      toast.error(t('Erreur de bascule de statut'));
     }
   };
 
@@ -101,10 +103,10 @@ export default function SavingsPage() {
     if (!configToDelete) return;
     try {
       await savingApi.deleteSavingConfig(configToDelete.id);
-      toast.success('Configuration d\'épargne supprimée !');
+      toast.success(t('Configuration d\'épargne supprimée !'));
       fetchData();
     } catch {
-      toast.error('Erreur lors de la suppression');
+      toast.error(t('Erreur lors de la suppression'));
     }
   };
 
@@ -117,7 +119,7 @@ export default function SavingsPage() {
             <PiggyBank size={24} />
           </div>
           <div>
-            <p className="text-sm text-slate-300">Épargne totale</p>
+            <p className="text-sm text-slate-300">{t('Épargne totale')}</p>
             <p className="text-2xl font-bold text-white">{formatCurrency(balance.totalSaved)}</p>
           </div>
         </Card>
@@ -127,7 +129,7 @@ export default function SavingsPage() {
             <Target size={24} />
           </div>
           <div>
-            <p className="text-sm text-slate-300">Alloué aux objectifs</p>
+            <p className="text-sm text-slate-300">{t('Alloué aux objectifs')}</p>
             <p className="text-2xl font-bold text-white">{formatCurrency(balance.allocatedToGoals)}</p>
           </div>
         </Card>
@@ -137,7 +139,7 @@ export default function SavingsPage() {
             <Wallet size={24} />
           </div>
           <div>
-            <p className="text-sm text-slate-300">Solde libre d'utilisation</p>
+            <p className="text-sm text-slate-300">{t('Solde libre d\'utilisation')}</p>
             <p className="text-2xl font-bold text-white">{formatCurrency(balance.freeBalance)}</p>
           </div>
         </Card>
@@ -145,8 +147,8 @@ export default function SavingsPage() {
 
       {/* Titre & Bouton d'ajout */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-bold text-white">Règles d'épargne automatique</h2>
-        <Button onClick={handleOpenAdd}><Plus size={16} /> Ajouter une règle</Button>
+        <h2 className="text-lg font-bold text-white">{t('Règles d\'épargne automatique')}</h2>
+        <Button onClick={handleOpenAdd}><Plus size={16} /> {t('Ajouter une règle')}</Button>
       </div>
 
       {/* Règles existantes */}
@@ -159,15 +161,15 @@ export default function SavingsPage() {
               <div className="flex justify-between items-start">
                 <div>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#2E5FA3]/10 text-[#2E5FA3] mb-2">
-                    {SAVING_MODES[c.mode]}
+                    {t(SAVING_MODES[c.mode])}
                   </span>
                   <p className="text-xl font-extrabold text-white">
-                    {c.mode === 'PERCENTAGE' ? `${c.percentage}% des revenus` : `${formatCurrency(c.fixedAmount)}`}
+                    {c.mode === 'PERCENTAGE' ? `${c.percentage}% ${t('des revenus')}` : `${formatCurrency(c.fixedAmount)}`}
                   </p>
                   <p className="text-xs text-slate-300 mt-1">
                     {c.mode === 'PERCENTAGE' 
-                      ? (c.applyToAllIncomes ? 'Appliqué à tous les revenus' : `Sur : ${c.specificIncomeTypes.join(', ')}`)
-                      : `Fréquence : ${FREQUENCIES[c.frequency]}`}
+                      ? (c.applyToAllIncomes ? t('Appliqué à tous les revenus') : `${t('Sur :')} ${c.specificIncomeTypes.map(it => t(INCOME_TYPES[it])).join(', ')}`)
+                      : `${t('Fréquence :')} ${t(FREQUENCIES[c.frequency])}`}
                   </p>
                 </div>
                   <div className="flex gap-1">
@@ -186,32 +188,32 @@ export default function SavingsPage() {
           ))}
         </div>
       ) : (
-        <EmptyState title="Aucune règle configurée" message="Configurez une règle d'épargne automatique pour économiser dès la réception d'un revenu." />
+        <EmptyState title={t("Aucune règle configurée")} message={t("Configurez une règle d'épargne automatique pour économiser dès la réception d'un revenu.")} />
       )}
 
       {/* Modal d'ajout / modification */}
-      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Configurer une règle d'épargne">
+      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title={t("Configurer une règle d'épargne")}>
         <form onSubmit={handleSubmit(handleSave)} className="space-y-4">
-          <Select label="Mode d'épargne" options={Object.entries(SAVING_MODES).map(([k, v]) => ({ value: k, label: v }))} {...register('mode')} />
+          <Select label={t("Mode d'épargne")} options={Object.entries(SAVING_MODES).map(([k, v]) => ({ value: k, label: t(v) }))} {...register('mode')} />
           
           {savingMode === 'PERCENTAGE' && (
             <>
-              <Input label="Pourcentage (%)" type="number" step="0.1" {...register('percentage', { required: 'Pourcentage obligatoire', min: 0.1, max: 100 })} error={errors.percentage?.message} />
+              <Input label={t("Pourcentage (%)")} type="number" step="0.1" {...register('percentage', { required: t('Pourcentage obligatoire'), min: 0.1, max: 100 })} error={errors.percentage?.message} />
               
               <div className="space-y-2 pt-2">
                 <div className="flex items-center gap-2">
                   <input type="checkbox" id="applyToAllIncomes" {...register('applyToAllIncomes')} className="rounded border-gray-300 text-primary" />
-                  <label htmlFor="applyToAllIncomes" className="text-sm font-medium text-gray-700">Appliquer à tous les revenus</label>
+                  <label htmlFor="applyToAllIncomes" className="text-sm font-medium text-gray-700">{t('Appliquer à tous les revenus')}</label>
                 </div>
                 
                 {!watch('applyToAllIncomes') && (
                   <div className="space-y-1">
-                    <label className="block text-sm font-medium text-gray-700">Revenus ciblés :</label>
+                    <label className="block text-sm font-medium text-gray-700">{t('Revenus ciblés :')}</label>
                     <div className="grid grid-cols-2 gap-2">
                       {Object.entries(INCOME_TYPES).map(([k, v]) => (
                         <div key={k} className="flex items-center gap-2">
                           <input type="checkbox" id={`inc_${k}`} value={k} {...register('specificIncomeTypes')} className="rounded border-gray-300 text-primary" />
-                          <label htmlFor={`inc_${k}`} className="text-xs text-gray-600">{v}</label>
+                          <label htmlFor={`inc_${k}`} className="text-xs text-gray-600">{t(v)}</label>
                         </div>
                       ))}
                     </div>
@@ -223,23 +225,23 @@ export default function SavingsPage() {
 
           {savingMode === 'FIXED' && (
             <>
-              <Input label="Montant fixe" type="number" step="0.01" {...register('fixedAmount', { required: 'Montant obligatoire', min: 0.01 })} error={errors.fixedAmount?.message} />
+              <Input label={t("Montant fixe")} type="number" step="0.01" {...register('fixedAmount', { required: t('Montant obligatoire'), min: 0.01 })} error={errors.fixedAmount?.message} />
               <div className="grid grid-cols-2 gap-3">
-                <Select label="Fréquence" options={Object.entries(FREQUENCIES).map(([k, v]) => ({ value: k, label: v }))} {...register('frequency')} />
-                <Input label="Jour de récurrence" type="number" {...register('recurrenceDay', { min: 1, max: 28 })} />
+                <Select label={t("Fréquence")} options={Object.entries(FREQUENCIES).map(([k, v]) => ({ value: k, label: t(v) }))} {...register('frequency')} />
+                <Input label={t("Jour de récurrence")} type="number" {...register('recurrenceDay', { min: 1, max: 28 })} />
               </div>
             </>
           )}
 
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Annuler</Button>
-            <Button type="submit">Sauvegarder</Button>
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>{t('Annuler')}</Button>
+            <Button type="submit">{t('Sauvegarder')}</Button>
           </div>
         </form>
       </Modal>
 
       {/* Confirm deletion */}
-      <ConfirmDialog isOpen={!!configToDelete} onClose={() => setConfigToDelete(null)} onConfirm={handleDelete} message="Voulez-vous vraiment supprimer cette règle d'épargne ?" />
+      <ConfirmDialog isOpen={!!configToDelete} onClose={() => setConfigToDelete(null)} onConfirm={handleDelete} message={t("Voulez-vous vraiment supprimer cette règle d'épargne ?")} />
     </div>
   );
 }

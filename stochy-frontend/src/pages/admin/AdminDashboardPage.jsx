@@ -23,7 +23,15 @@ export default function AdminDashboardPage() {
   if (loading) return <LoadingSpinner size="lg" />;
   if (!data) return null;
 
-  const { totalUsers, activeUsersCount, userActivityRate, averageIncome, averageExpense, professionalStatusDistribution, genderDistribution } = data;
+  const usersStats = data.usersStats || {};
+  const finStats = data.financialStats || {};
+  const demoStats = data.demographicsStats || {};
+
+  const totalUsers = usersStats.totalUsers || 0;
+  const activeUsersCount = usersStats.activeUsers || 0;
+  const userActivityRate = totalUsers > 0 ? activeUsersCount / totalUsers : 0;
+  const averageIncome = finStats.averageMonthlyIncome || 0;
+  const averageExpense = finStats.averageMonthlyExpenses || 0;
 
   const stats = [
     { label: 'Utilisateurs inscrits', value: totalUsers, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -52,9 +60,9 @@ export default function AdminDashboardPage() {
         <Card>
           <h3 className="text-sm font-semibold text-slate-200 mb-4">Distribution par Statut Professionnel</h3>
           <div className="h-[280px]">
-            {Object.keys(professionalStatusDistribution || {}).length > 0 ? (
+            {demoStats.byProfessionalStatus && demoStats.byProfessionalStatus.length > 0 && demoStats.byProfessionalStatus.some(d => d.count > 0) ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={Object.entries(professionalStatusDistribution).map(([k, v]) => ({ name: k, 'Utilisateurs': v }))}>
+                <BarChart data={demoStats.byProfessionalStatus.filter(d => d.count > 0).map(d => ({ name: d.status, 'Utilisateurs': d.count }))}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
@@ -72,11 +80,11 @@ export default function AdminDashboardPage() {
         <Card>
           <h3 className="text-sm font-semibold text-slate-200 mb-4">Distribution par Genre</h3>
           <div className="h-[280px]">
-            {Object.keys(genderDistribution || {}).length > 0 ? (
+            {demoStats.byGender && demoStats.byGender.length > 0 && demoStats.byGender.some(d => d.count > 0) ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={Object.entries(genderDistribution).map(([k, v]) => ({ name: k, value: v }))}
+                    data={demoStats.byGender.filter(d => d.count > 0).map(d => ({ name: d.status, value: d.count }))}
                     dataKey="value"
                     nameKey="name"
                     cx="50%"
@@ -85,7 +93,7 @@ export default function AdminDashboardPage() {
                     innerRadius={40}
                     label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                   >
-                    {Object.entries(genderDistribution).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    {demoStats.byGender.filter(d => d.count > 0).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Tooltip />
                 </PieChart>
