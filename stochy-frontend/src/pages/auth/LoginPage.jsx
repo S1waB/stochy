@@ -23,7 +23,11 @@ export default function LoginPage() {
       const { accessToken, user: userData } = res.data;
       login(accessToken, userData);
       toast.success(t('Connexion réussie !'));
-      navigate('/dashboard');
+      if (userData.role === 'ROLE_ADMIN') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || t('Email ou mot de passe incorrect.'));
     } finally { 

@@ -17,4 +17,5 @@ public class GoalContributionRequest {
 
     private String contributionDate;
     private String notes;
+    private String source; // "MANUAL" or "FROM_SAVINGS"
 }

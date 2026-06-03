@@ -113,7 +113,7 @@ export default function SavingsPage() {
   return (
     <div className="space-y-6">
       {/* Résumé des soldes */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="flex items-center gap-4 border-l-4 border-l-brand-light/40">
           <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-[#2E5FA3]">
             <PiggyBank size={24} />
@@ -131,16 +131,6 @@ export default function SavingsPage() {
           <div>
             <p className="text-sm text-slate-300">{t('Alloué aux objectifs')}</p>
             <p className="text-2xl font-bold text-white">{formatCurrency(balance.allocatedToGoals)}</p>
-          </div>
-        </Card>
-
-        <Card className="flex items-center gap-4 border-l-4 border-l-emerald-500">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500">
-            <Wallet size={24} />
-          </div>
-          <div>
-            <p className="text-sm text-slate-300">{t('Solde libre d\'utilisation')}</p>
-            <p className="text-2xl font-bold text-white">{formatCurrency(balance.freeBalance)}</p>
           </div>
         </Card>
       </div>

@@ -28,11 +28,12 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminUserDetailPage from './pages/admin/AdminUserDetailPage';
 
-function PrivateRoute({ children, adminOnly = false }) {
+function PrivateRoute({ children, adminOnly = false, userOnly = false }) {
   const { isAuthenticated, isAdmin } = useAuth();
   
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (adminOnly && !isAdmin) return <Navigate to="/dashboard" replace />;
+  if (userOnly && isAdmin) return <Navigate to="/admin/dashboard" replace />;
   
   return children;
 }
@@ -67,8 +68,13 @@ export default function App() {
               </div>
             } />
 
-            {/* Routes privées utilisateur */}
+            {/* Routes privées communes */}
             <Route element={<PrivateRoute><AppLayout /></PrivateRoute>}>
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
+
+            {/* Routes privées utilisateur uniquement */}
+            <Route element={<PrivateRoute userOnly={true}><AppLayout /></PrivateRoute>}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/transactions" element={<TransactionsPage />} />
               <Route path="/budget" element={<BudgetsPage />} />
@@ -77,7 +83,6 @@ export default function App() {
               <Route path="/loans" element={<LoansPage />} />
               <Route path="/debts" element={<DebtsPage />} />
               <Route path="/forecast" element={<ForecastPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
             </Route>
 
             {/* Routes d'administration */}

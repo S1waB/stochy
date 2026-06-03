@@ -62,6 +62,11 @@ public class SavingGoalController {
                 authService.getCurrentUserId(), id, body.get("fundingMode")));
     }
 
+    @GetMapping("/{id}/contributions")
+    public ResponseEntity<List<com.stochy.dto.response.GoalContributionResponse>> getContributions(@PathVariable UUID id) {
+        return ResponseEntity.ok(savingGoalService.getContributions(authService.getCurrentUserId(), id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         savingGoalService.deleteGoal(authService.getCurrentUserId(), id);

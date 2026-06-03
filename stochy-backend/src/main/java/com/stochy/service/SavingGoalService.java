@@ -2,15 +2,19 @@ package com.stochy.service;
 
 import com.stochy.dto.request.GoalContributionRequest;
 import com.stochy.dto.request.SavingGoalRequest;
+import com.stochy.dto.response.GoalContributionResponse;
 import com.stochy.dto.response.SavingGoalResponse;
 import com.stochy.entity.GoalContribution;
 import com.stochy.entity.SavingGoal;
+import com.stochy.entity.Transaction;
 import com.stochy.entity.User;
 import com.stochy.enums.GoalFundingMode;
+import com.stochy.enums.TransactionType;
 import com.stochy.exception.BadRequestException;
 import com.stochy.exception.ResourceNotFoundException;
 import com.stochy.repository.GoalContributionRepository;
 import com.stochy.repository.SavingGoalRepository;
+import com.stochy.repository.TransactionRepository;
 import com.stochy.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,14 +34,17 @@ public class SavingGoalService {
     private final GoalContributionRepository goalContributionRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final TransactionRepository transactionRepository;
 
     public SavingGoalService(SavingGoalRepository savingGoalRepository,
                              GoalContributionRepository goalContributionRepository,
-                             UserRepository userRepository, NotificationService notificationService) {
+                             UserRepository userRepository, NotificationService notificationService,
+                             TransactionRepository transactionRepository) {
         this.savingGoalRepository = savingGoalRepository;
         this.goalContributionRepository = goalContributionRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
+        this.transactionRepository = transactionRepository;
     }
 
     @Transactional
@@ -113,6 +120,19 @@ public class SavingGoalService {
 
         goalContributionRepository.save(contribution);
 
+        if ("MANUAL".equalsIgnoreCase(request.getSource())) {
+            User user = userRepository.findById(userId).orElseThrow();
+            Transaction transaction = Transaction.builder()
+                    .user(user)
+                    .title("Dépôt manuel vers objectif: " + goal.getName())
+                    .amount(request.getAmount())
+                    .type(TransactionType.SAVING)
+                    .transactionDate(contribution.getContributionDate())
+                    .isRecurring(false)
+                    .build();
+            transactionRepository.save(transaction);
+        }
+
         goal.setCurrentAmount(goal.getCurrentAmount().add(request.getAmount()));
         if (goal.getCurrentAmount().compareTo(goal.getTargetAmount()) >= 0) {
             goal.setIsCompleted(true);
@@ -141,6 +161,23 @@ public class SavingGoalService {
                 .orElseThrow(() -> new ResourceNotFoundException("Objectif introuvable"));
         if (!goal.getUser().getId().equals(userId)) throw new BadRequestException("Accès non autorisé.");
         savingGoalRepository.delete(goal);
+    }
+
+    public List<GoalContributionResponse> getContributions(UUID userId, UUID goalId) {
+        SavingGoal goal = savingGoalRepository.findById(goalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Objectif introuvable"));
+        if (!goal.getUser().getId().equals(userId)) throw new BadRequestException("Accès non autorisé.");
+        
+        return goalContributionRepository.findByGoalIdOrderByContributionDateDesc(goalId).stream()
+                .map(c -> GoalContributionResponse.builder()
+                        .id(c.getId())
+                        .amount(c.getAmount())
+                        .contributionDate(c.getContributionDate())
+                        .isAutomatic(c.getIsAutomatic())
+                        .notes(c.getNotes())
+                        .createdAt(c.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private SavingGoalResponse mapToResponse(SavingGoal goal) {

@@ -13,7 +13,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { formatCurrency, formatDate, formatPercent } from '../../utils/formatters';
 import { FUNDING_MODES } from '../../utils/constants';
 import toast from 'react-hot-toast';
-import { Plus, PiggyBank, Calendar, Edit, Trash2 } from 'lucide-react';
+import { Plus, PiggyBank, Calendar, Edit, Trash2, History } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function GoalsPage() {
@@ -27,6 +27,9 @@ export default function GoalsPage() {
   const [goalToDelete, setGoalToDelete] = useState(null);
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [editingGoal, setEditingGoal] = useState(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [goalHistory, setGoalHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const { register: registerContrib, handleSubmit: handleContribSubmit, reset: resetContrib, formState: { errors: contribErrors } } = useForm();
@@ -67,8 +70,22 @@ export default function GoalsPage() {
 
   const handleOpenContribute = (goal) => {
     setSelectedGoal(goal);
-    resetContrib({ amount: '', contributionDate: new Date().toISOString().split('T')[0], notes: '' });
+    resetContrib({ amount: '', contributionDate: new Date().toISOString().split('T')[0], notes: '', source: 'FROM_SAVINGS' });
     setIsContributeOpen(true);
+  };
+
+  const handleOpenHistory = async (goal) => {
+    setSelectedGoal(goal);
+    setIsHistoryOpen(true);
+    setHistoryLoading(true);
+    try {
+      const res = await goalApi.getGoalContributions(goal.id);
+      setGoalHistory(res.data);
+    } catch {
+      toast.error(t('Erreur lors du chargement de l\'historique'));
+    } finally {
+      setHistoryLoading(false);
+    }
   };
 
   const handleSave = async (data) => {
@@ -165,13 +182,16 @@ export default function GoalsPage() {
               </div>
 
               {/* Actions de l'objectif */}
-              {!g.isCompleted && (
-                <div className="flex gap-2">
-                  <Button variant="outline" className="w-full" onClick={() => handleOpenContribute(g)}>
+              <div className="flex gap-2">
+                {!g.isCompleted && (
+                  <Button variant="outline" className="flex-1" onClick={() => handleOpenContribute(g)}>
                     <PiggyBank size={16} /> {t('Contribuer')}
                   </Button>
-                </div>
-              )}
+                )}
+                <Button variant="outline" className={g.isCompleted ? "w-full" : "flex-1"} onClick={() => handleOpenHistory(g)}>
+                  <History size={16} /> {t('Historique')}
+                </Button>
+              </div>
             </Card>
           ))}
         </div>
@@ -204,6 +224,16 @@ export default function GoalsPage() {
             <Input label={t("Montant")} type="number" step="0.01" {...registerContrib('amount', { required: t('Montant obligatoire'), min: { value: 0.01, message: t('Doit être supérieur à 0') } })} error={contribErrors.amount?.message} />
             <Input label={t("Date de contribution")} type="date" {...registerContrib('contributionDate')} />
           </div>
+          
+          <Select 
+            label={t("Source de la contribution")} 
+            options={[
+              { value: 'FROM_SAVINGS', label: t("Depuis l'épargne (Déjà enregistré)") },
+              { value: 'MANUAL', label: t("Manuel (Nouveau dépôt)") }
+            ]} 
+            {...registerContrib('source')} 
+          />
+
           <Input label={t("Notes")} {...registerContrib('notes')} />
 
           <div className="flex gap-3 justify-end pt-4">
@@ -211,6 +241,29 @@ export default function GoalsPage() {
             <Button type="submit">{t('Enregistrer')}</Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Modal d'historique */}
+      <Modal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} title={`${t('Historique')} - "${t(selectedGoal?.name)}"`}>
+        {historyLoading ? (
+          <div className="py-8 flex justify-center"><LoadingSpinner /></div>
+        ) : goalHistory.length > 0 ? (
+          <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+            {goalHistory.map(h => (
+              <div key={h.id} className="bg-white/5 border border-[var(--surface-border)] rounded-xl p-3 flex justify-between items-center">
+                <div>
+                  <p className="font-bold text-white">{formatCurrency(h.amount)}</p>
+                  <p className="text-xs text-slate-400 mt-1">{formatDate(h.contributionDate)} {h.isAutomatic ? `(${t('Automatique')})` : ''}</p>
+                </div>
+                {h.notes && (
+                  <p className="text-xs text-slate-300 italic max-w-[50%] text-right">{h.notes}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <EmptyState title={t("Aucun historique")} message={t("Aucune contribution n'a encore été faite à cet objectif.")} />
+        )}
       </Modal>
 
       {/* Dialogue de suppression */}
