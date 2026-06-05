@@ -83,4 +83,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
                                     @Param("month") int month, @Param("year") int year);
 
     long countByUserId(UUID userId);
+
+    List<Transaction> findByUserIdOrderByTransactionDateDesc(UUID userId);
 }

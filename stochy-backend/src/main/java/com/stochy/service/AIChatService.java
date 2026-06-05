@@ -59,7 +59,7 @@ public class AIChatService {
             headers.setBearerAuth(groqApiKey);
 
             Map<String, Object> body = new HashMap<>();
-            body.put("model", "llama3-70b-8192");
+            body.put("model", "llama-3.1-8b-instant");
             
             Map<String, String> systemMessage = new HashMap<>();
             systemMessage.put("role", "system");

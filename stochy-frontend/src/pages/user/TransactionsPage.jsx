@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as txApi from '../../api/transaction.api';
+import { exportTransactionsCsv, exportTransactionsPdf } from '../../api/transaction.api';
 import * as catApi from '../../api/category.api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
@@ -15,8 +16,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { TRANSACTION_TYPES, EXPENSE_TYPES, INCOME_TYPES, SCOPES, FREQUENCIES } from '../../utils/constants';
 import toast from 'react-hot-toast';
-import { Plus, Filter, Upload, FileText, Edit, Trash2 } from 'lucide-react';
-import api from '../../api/axios';
+import { Plus, Filter, FileText, Download, Edit, Trash2 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function TransactionsPage() {
@@ -29,7 +29,6 @@ export default function TransactionsPage() {
   
   // Modals & Dialogs
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isImportOpen, setIsImportOpen] = useState(false);
   const [txToDelete, setTxToDelete] = useState(null);
   const [editingTx, setEditingTx] = useState(null);
 
@@ -115,20 +114,33 @@ export default function TransactionsPage() {
     }
   };
 
-  const handleImportCsv = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append('file', file);
+  const handleExportCsv = async () => {
     try {
-      const res = await api.post('/csv/import', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      toast.success(`${res.data.imported} ${t('transactions importées avec succès !')}`);
-      setIsImportOpen(false);
-      fetchTransactions();
+      const res = await exportTransactionsCsv();
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'transactions.csv';
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success(t('Export CSV téléchargé !'));
     } catch {
-      toast.error(t('Erreur de traitement du fichier CSV'));
+      toast.error(t('Erreur lors de l\'export CSV'));
+    }
+  };
+
+  const handleExportPdf = async () => {
+    try {
+      const res = await exportTransactionsPdf();
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'transactions.pdf';
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success(t('Export PDF téléchargé !'));
+    } catch {
+      toast.error(t('Erreur lors de l\'export PDF'));
     }
   };
 
@@ -183,8 +195,11 @@ export default function TransactionsPage() {
           </select>
         </div>
           <div className="flex gap-2 w-full sm:w-auto">
-          <Button variant="outline" onClick={() => setIsImportOpen(true)} className="flex-1 sm:flex-none">
-            <Upload size={16} /> {t('CSV')}
+          <Button variant="outline" onClick={handleExportCsv} className="flex-1 sm:flex-none">
+            <Download size={16} /> {t('Export CSV')}
+          </Button>
+          <Button variant="outline" onClick={handleExportPdf} className="flex-1 sm:flex-none">
+            <FileText size={16} /> {t('Export PDF')}
           </Button>
           <Button onClick={handleOpenAdd} className="flex-1 sm:flex-none">
             <Plus size={16} /> {t('Ajouter')}
@@ -265,21 +280,6 @@ export default function TransactionsPage() {
         </form>
       </Modal>
 
-      {/* Modal d'import CSV */}
-      <Modal isOpen={isImportOpen} onClose={() => setIsImportOpen(false)} title={t("Importer des transactions via CSV")} size="sm">
-        <div className="space-y-4 text-center">
-          <p className="text-sm text-gray-500">
-            {t("Téléchargez un fichier CSV contenant les colonnes suivantes dans l'ordre :")}
-            <br /><strong>{t('Titre')}, {t('Montant')}, {t('Type')} (EXPENSE/INCOME/SAVING), {t('Catégorie')}, {t('Date')} (AAAA-MM-JJ), {t('Notes')}, {t('Récurrent')} (true/false)</strong>
-          </p>
-          <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 cursor-pointer hover:border-primary/50 transition-colors relative">
-            <input type="file" accept=".csv" onChange={handleImportCsv} className="absolute inset-0 opacity-0 cursor-pointer" />
-            <Upload size={32} className="text-gray-400 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-600">{t("Cliquez pour choisir un fichier ou déposez-le ici")}</p>
-          </div>
-          <Button variant="outline" onClick={() => setIsImportOpen(false)} className="w-full">{t('Annuler')}</Button>
-        </div>
-      </Modal>
 
       {/* Boîte de dialogue de confirmation de suppression */}
       <ConfirmDialog isOpen={!!txToDelete} onClose={() => setTxToDelete(null)} onConfirm={handleDelete} message={`${t('Voulez-vous vraiment supprimer la transaction')} "${txToDelete?.title}" ?`} />
